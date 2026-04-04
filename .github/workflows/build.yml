@@ -1,1 +1,122 @@
+name: SwiftX Build
 
+# Ne zaman çalışır:
+# - main branch'e push yapılınca
+# - GitHub'da manuel olarak "Run workflow" butonuna basılınca
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  # ── Windows Build ──────────────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Bağımlılıkları kur
+        run: pip install pyinstaller PySide6
+
+      - name: PyInstaller ile derle
+        run: |
+          pyinstaller --onefile --windowed --name "SwiftX" --icon "SXBETALOGO3.png" "browser (v27).py"
+
+      - name: Ek dosyaları dist klasörüne kopyala
+        run: |
+          copy "bg.jpg" "dist\bg.jpg"
+          copy "home (v6).html" "dist\home (v6).html"
+          copy "SXBETALOGO3.png" "dist\SXBETALOGO3.png"
+
+      - name: Windows artifact yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: SwiftX-Windows
+          path: dist/
+
+  # ── Linux Build ────────────────────────────────────────────────────────────
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu çek
+        uses: actions/checkout@v4
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Sistem bağımlılıklarını kur
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libegl1 libxcb-cursor0 libxkbcommon-x11-0
+
+      - name: Bağımlılıkları kur
+        run: pip install pyinstaller PySide6
+
+      - name: PyInstaller ile derle
+        run: |
+          pyinstaller --onefile --windowed --name "SwiftX" "browser (v27).py"
+
+      - name: Ek dosyaları dist klasörüne kopyala
+        run: |
+          cp "bg.jpg" "dist/bg.jpg"
+          cp "home (v6).html" "dist/home (v6).html"
+          cp "SXBETALOGO3.png" "dist/SXBETALOGO3.png"
+
+      - name: Linux artifact yükle
+        uses: actions/upload-artifact@v4
+        with:
+          name: SwiftX-Linux
+          path: dist/
+
+  # ── Release Oluştur ────────────────────────────────────────────────────────
+  # Her iki build tamamlanınca otomatik GitHub Release açar
+  release:
+    needs: [ build-windows, build-linux ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Windows artifact indir
+        uses: actions/download-artifact@v4
+        with:
+          name: SwiftX-Windows
+          path: windows/
+
+      - name: Linux artifact indir
+        uses: actions/download-artifact@v4
+        with:
+          name: SwiftX-Linux
+          path: linux/
+
+      - name: Zip oluştur
+        run: |
+          cd windows && zip -r ../SwiftX-Windows.zip . && cd ..
+          cd linux   && zip -r ../SwiftX-Linux.zip .   && cd ..
+
+      - name: GitHub Release yayınla
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v0.27-openAlpha
+          name: "SwiftX v0.27-openAlpha"
+          body: |
+            ## SwiftX v0.27-openAlpha
+
+            ### İndirme / Download
+            - **Windows**: `SwiftX-Windows.zip` → `SwiftX.exe` dosyasını çalıştır
+            - **Linux**: `SwiftX-Linux.zip` → `SwiftX` dosyasını çalıştır
+
+            ### Notlar
+            - bg.jpg, home (v6).html ve SXBETALOGO3.png dosyaları executable ile aynı klasörde olmalı
+            - Bu bir openAlpha sürümüdür, hatalar olabilir
+          files: |
+            SwiftX-Windows.zip
+            SwiftX-Linux.zip
