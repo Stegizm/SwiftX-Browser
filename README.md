@@ -33,7 +33,7 @@ SwiftX is a hobby browser project built on top of Qt WebEngine. It started as a 
 - Python 3.10+
 - PySide6
 
-### Source Installation (Optional / for developers)
+### Installation (Optional / for developers)
 ```bash
 pip install -r requirements.txt
 python "browser (v27).py"
@@ -66,7 +66,7 @@ SwiftX, Qt WebEngine üzerine inşa edilmiş bir hobi tarayıcı projesidir. Tar
 - Python 3.10+
 - PySide6
 
-### Kaynak Kodu ile Kurulum (Opsiyonel / geliştiriciler için)
+### Kurulum (Opsiyonel / geliştiriciler için)
 ```bash 
 pip install -r requirements.txt
 python "browser (v27).py"

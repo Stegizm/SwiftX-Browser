@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<!--
+  SwiftX — Ana Sayfa (home v6) — EXPLAINED VERSION
+  ==================================================
+  Bu dosya, orijinal home.html dosyasının birebir kopyasıdır.
+  Fark: Her CSS kuralı, HTML bölümü ve JavaScript fonksiyonunun
+  ne yaptığını açıklayan Türkçe yorumlar eklenmiştir.
+
+  eğer bir fork yaratıcaksanız lütfen bu dosyayı değiştirmeyin.
+  sürüm güncellemelerinde bu dosyaya dokunulmayacaktır bu sadece öğrenmek isteyenler içindir.
+
+  Meraklı geliştiriciler için hazırlanmıştır.
+  Bu dosya browser (v27).py tarafından ana sayfa olarak yüklenir.
+  file:// protokolü ile açılır — sunucu gerektirmez.
+
+-->
+
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- viewport: mobil cihazlarda sayfanın doğru ölçeklenmesi için -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwiftX — Ana Sayfa</title>
+
+  <style>
+    /* ── Reset ────────────────────────────────────────────────────────────────
+       Tarayıcıların varsayılan margin/padding değerlerini sıfırlar.
+       box-sizing: border-box → padding ve border genişliği toplam boyuta dahil edilir.
+       Bu olmadan hesaplamalar tutarsız olur.
+    */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* ── Body ─────────────────────────────────────────────────────────────────
+       min-height: 100vh → sayfanın en az ekran yüksekliği kadar olmasını sağlar.
+       font-family: SF Pro önce Apple cihazlara, sonra Windows'a, sonra genel sans-serif'e bakar.
+       display: flex + align-items/justify-content: center → içeriği tam ortalar.
+       overflow: hidden → arka plan görseli taşmasın diye kaydırma çubuğunu gizler.
+       position: relative → z-index'in doğru çalışması için gerekli.
+    */
+    body {
+      min-height: 100vh;
+      font-family: 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      color: #fff;
+    }
+
+    /* ── Arka Plan (#bg) ──────────────────────────────────────────────────────
+       position: fixed + inset: 0 → tam ekranı kaplar, scroll'la kayması önlenir.
+       z-index: 0 → en arkada kalır, diğer her şeyin altında.
+       background-size: cover → görsel her zaman ekranı tam kaplar, oran korunur.
+       background-position: center 55% → görselin dikey olarak biraz aşağısını gösterir
+         (dağın zirveleri yerine orta kısmı görünür).
+       transition: opacity 1.5s → arka plan görseli değiştirilirse yumuşak geçiş yapar.
+         (Bu sürümde kullanılmıyor ama gelecekteki günlük wallpaper özelliği için hazır.)
+    */
+    #bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url('bg.jpg');
+      background-size: cover;
+      background-position: center 55%;
+      transition: opacity 1.5s ease;
+    }
+
+    /* ── Karartma Katmanı (#overlay) ──────────────────────────────────────────
+       Arka plan görseli üzerine şeffaf koyu bir katman bindirir.
+       Bu olmadan beyaz metin görselin açık bölgelerinde okunamaz olur.
+       z-index: 1 → arka plandan üstte ama içerikten altta.
+       linear-gradient → üstten alta doğru karartma artar:
+         - Üst: %38 koyu (marka/logo okunabilsin)
+         - Orta: %45 koyu
+         - Alt: %72 koyu (saatin altındaki arama kutusu için daha fazla kontrast)
+    */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(to bottom,
+          rgba(0, 0, 0, 0.38) 0%,
+          rgba(0, 0, 0, 0.45) 40%,
+          rgba(0, 0, 0, 0.72) 100%);
+    }
+
+    /* ── İçerik Wrapper (.content) ───────────────────────────────────────────
+       z-index: 2 → arka plan ve overlay'in önünde.
+       display: flex + flex-direction: column → içerikleri dikey olarak sıralar.
+       align-items: center → her öğeyi yatay olarak ortalar.
+       padding: 0 24px → kenarlarda boşluk bırakır (mobil için önemli).
+    */
+    .content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding: 0 24px;
+    }
+
+    /* ── Eski Marka Stili (.brand) ────────────────────────────────────────────
+       Bu class artık HTML'de kullanılmıyor (v5'te kaldırıldı).
+       Sadece CSS'de referans olarak kaldı, silinebilir.
+    */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      opacity: 0.85;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+    }
+
+    .brand-name {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ── Logo Bölümü (.logo) ──────────────────────────────────────────────────
+       Logo görselini ve "SwiftX" yazısını yan yana gösterir.
+       gap: 12px → görsel ile yazı arasındaki boşluk.
+       opacity: 0.85 → tam beyazdan biraz daha soluk, ince görünüm için.
+       margin-bottom: 32px → saatin üstünde boşluk.
+    */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      opacity: 0.85;
+    }
+
+    /* .logo-img → kullanılmıyor, görsel inline style ile boyutlandırılıyor */
+    .logo-img {
+      width: 48px;
+      height: 48px;
+    }
+
+    /* .logo-text → "SwiftX" yazısının stili
+       letter-spacing: 5px → harfler arası geniş boşluk, kurumsal görünüm için.
+       text-transform: uppercase → küçük harfle yazılsa bile büyük görünür.
+       rgba(255,255,255,0.75) → tam beyazdan biraz daha saydam.
+    */
+    .logo-text {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    /* ── Saat (#clock) ────────────────────────────────────────────────────────
+       font-size: 100px → büyük, gösterişli saat görüntüsü.
+       font-weight: 100 → çok ince yazı tipi (ekran saatlerinin minimalist estetiği).
+       letter-spacing: -6px → rakamlar arası boşluğu azaltır, daha kompakt görünür.
+       line-height: 1 → satır yüksekliği tam font boyutunda, ekstra boşluk yok.
+       text-shadow → hafif gölge, arka plan görseli ne olursa olsun okunabilirliği artırır.
+    */
+    #clock {
+      font-size: 100px;
+      font-weight: 100;
+      letter-spacing: -6px;
+      color: rgba(255, 255, 255, 0.95);
+      line-height: 1;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ── Tarih (#date) ────────────────────────────────────────────────────────
+       Saatin altındaki küçük tarih metni.
+       letter-spacing: 4px + uppercase → küçük ama dikkat çekici.
+       rgba(255,255,255,0.65) → saate göre daha soluk, hiyerarşi için.
+       margin-bottom: 56px → tarih ile arama kutusu arasında belirgin boşluk.
+    */
+    #date {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.65);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 56px;
+    }
+
+    /* ── Arama Kutusu Wrapper (.search-wrap) ──────────────────────────────────
+       position: relative → içindeki arama butonunu (.search-btn) konumlandırmak için.
+       max-width: 540px → çok geniş ekranlarda kutu çok uzamasın.
+       width: 100% → dar ekranlarda tam genişliği kaplar.
+    */
+    .search-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: 52px;
+    }
+
+    /* ── Arama Girişi (#search) ───────────────────────────────────────────────
+       height: 50px → dokunmatik ekranlar için yeterince büyük.
+       background: rgba(0,0,0,0.45) → yarı saydam koyu arka plan.
+       border: 1px solid rgba(255,255,255,0.25) → ince, soluk beyaz kenarlık.
+       border-radius: 25px → tam yuvarlak köşeler (height/2 = pill şekli).
+       padding: 0 50px 0 22px → sağda buton için yer bırakır.
+       backdrop-filter: blur(24px) → arkasındaki görseli bulanıklaştırır (glassmorphism).
+       -webkit-backdrop-filter → Safari için gerekli prefix.
+    */
+    #search {
+      width: 100%;
+      height: 50px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 25px;
+      padding: 0 50px 0 22px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      outline: none;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+      font-family: inherit;
+      letter-spacing: 0.2px;
+    }
+
+    /* placeholder rengi — varsayılan gri yerine soluk beyaz */
+    #search::placeholder {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    /* Odaklanınca biraz daha koyu ve mavi kenarlık + hafif glow */
+    #search:focus {
+      background: rgba(0, 0, 0, 0.55);
+      border-color: rgba(255, 255, 255, 0.35);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+    }
+
+    /* ── Arama Butonu (.search-btn) ───────────────────────────────────────────
+       position: absolute → parent'a (.search-wrap) göre konumlanır.
+       right: 6px + top: 50% + translateY(-50%) → giriş kutusunun sağına dikey ortada.
+       Büyütme ikonu (SVG) içerir.
+    */
+    .search-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .search-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ── Yer İşaretleri (.bookmarks) ─────────────────────────────────────────
+       display: flex + flex-wrap: wrap → fazla yer imi varsa alt satıra geçer.
+       justify-content: center → ortada hizalar.
+       max-width: 560px → çok geniş yayılmasın.
+    */
+    .bookmarks {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 560px;
+    }
+
+    /* ── Tek Yer İmi (.bookmark) ──────────────────────────────────────────────
+       flex-direction: column → ikon üstte, yazı altta.
+       text-decoration: none → a etiketinin varsayılan altı çizgisini kaldırır.
+       transition: transform → hover animasyonu için.
+       cubic-bezier(0.34, 1.56, 0.64, 1) → spring easing (hedefin biraz üstüne çıkıp geri döner).
+    */
+    .bookmark {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* Hover: yukarı kayar ve biraz büyür (spring animasyonla) */
+    .bookmark:hover {
+      transform: translateY(-5px) scale(1.05);
+    }
+
+    /* ── Yer İmi İkonu (.bookmark-icon) ──────────────────────────────────────
+       Favicon'u barındıran kare kutu.
+       border-radius: 16px → yuvarlak köşeli kare (iOS uygulama ikonu stili).
+       backdrop-filter: blur(16px) → glassmorphism efekti.
+       overflow: hidden → favicon görsel kutunun dışına taşmasın.
+    */
+    .bookmark-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.40);
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: background 0.2s, border-color 0.2s;
+      overflow: hidden;
+    }
+
+    /* Favicon görsel boyutu — Google favicon servisi 48px döndürür */
+    .bookmark-icon img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    /* Hover'da ikon kutusu biraz aydınlanır */
+    .bookmark:hover .bookmark-icon {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ── Yer İmi Etiketi (.bookmark-label) ───────────────────────────────────
+       İkon altındaki site adı.
+       letter-spacing: 1px + uppercase → compact ama okunaklı.
+    */
+    .bookmark-label {
+      font-size: 10px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ── Alt Bar (#footer) ────────────────────────────────────────────────────
+       position: fixed → sayfa scroll edilse de altta kalır.
+       left/right: 0 → tam genişlik.
+       z-index: 2 → içerik katmanıyla aynı seviyede.
+       justify-content: space-between → "SX BROWSER" sol, fotoğraf kredisi sağ.
+       gradient → alttan yukarıya soluklaşan koyu gradient (footer'ı arka plandan ayırır).
+    */
+    #footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 22px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
+    }
+
+    /* Marka adı — çok soluk, dikkat dağıtmayan bir imza */
+    .footer-brand {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      color: rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+    }
+
+    /* Fotoğraf kredisi — Unsplash lisansı gereği gösterilir */
+    #credit {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.3px;
+    }
+
+    #credit a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    #credit a:hover {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ── Fade-Up Animasyonu ───────────────────────────────────────────────────
+       @keyframes fadeUp: öğeler aşağıdan yukarıya doğru belirerek görünür.
+       from: opacity 0 + 16px aşağıda → to: opacity 1 + orijinal konum.
+       Her öğeye farklı delay verilir → kademeli bir giriş efekti oluşur.
+       "both" fill-mode → animasyon başlamadan önce de "from" durumunda kalır
+         (flash of unstyled content önlenir).
+    */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* delay sırası: logo → saat → tarih → arama → linkler
+       Her biri 0.1s daha geç başlar → waterfall efekti */
+    .logo        { animation: fadeUp 0.8s ease 0.1s both; }
+    #clock       { animation: fadeUp 0.8s ease 0.2s both; }
+    #date        { animation: fadeUp 0.8s ease 0.3s both; }
+    .search-wrap { animation: fadeUp 0.8s ease 0.4s both; }
+    .bookmarks   { animation: fadeUp 0.8s ease 0.5s both; }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Arka Plan Katmanları ─────────────────────────────────────────────
+       #bg    → bg.jpg görselini gösterir (CSS'te tanımlı)
+       #overlay → üzerine binen yarı saydam karartma katmanı
+       İkisi de position: fixed, z-index sırasıyla 0 ve 1
+  -->
+  <div id="bg"></div>
+  <div id="overlay"></div>
+
+  <!-- ── Ana İçerik ──────────────────────────────────────────────────────
+       Tüm görünür öğeleri barındırır. z-index: 2 ile arka planların önünde.
+  -->
+  <div class="content">
+
+    <!-- ── Logo Bölümü ─────────────────────────────────────────────────────
+         img: SXBETALOGO3.png — tarayıcının bulunduğu klasörden yüklenir.
+         file:// protokolü ile açıldığı için göreli yol çalışır.
+         span.logo-text: "SwıftX" — Türkçe i (dotless i) kasıtlı kullanılmış,
+           uppercase ile "SWıFTX" yerine "SWIFTX" görünmesi için.
+    -->
+    <div class="logo">
+      <img src="SXBETALOGO3.png" alt="SwiftX" style="height: 48px; vertical-align: middle;">
+      <span class="logo-text">SwıftX</span>
+    </div>
+
+    <!-- ── Saat ────────────────────────────────────────────────────────────
+         JavaScript'teki tick() fonksiyonu her saniye bu içeriği günceller.
+         Başlangıçta "00:00" gösterir, tick() hemen çağrıldığı için anlık değere geçer.
+    -->
+    <div id="clock">00:00</div>
+
+    <!-- ── Tarih ───────────────────────────────────────────────────────────
+         tick() fonksiyonu bu içeriği de her saniye günceller.
+         Format: "Pazartesi,  1 Nisan" (DAYS ve MONTHS dizilerinden)
+         İki boşluk kasıtlı — görsel hava için.
+    -->
+    <div id="date">Pazartesi, 1 Ocak</div>
+
+    <!-- ── Arama Kutusu ────────────────────────────────────────────────────
+         autofocus: sayfa açıldığında imleç otomatik buraya gelir.
+         Enter tuşu ve buton tıklaması navigate() fonksiyonunu çağırır.
+         Arama mantığı: URL mi? → direkt yükle | Nokta var mı? → https ekle | Değilse → Google
+    -->
+    <div class="search-wrap">
+      <input id="search" type="text" placeholder="Ara veya adres gir…" autofocus>
+      <button class="search-btn" id="searchBtn" title="Ara">
+        <!-- SVG büyüteç ikonu — harici resim dosyası gerektirmez -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Hızlı Linkler (Yer İmleri) ──────────────────────────────────────
+         Her .bookmark bir <a> etiketi → tıklanınca direkt gider.
+         favicon URL'si: Google'ın favicon servisi (google.com/s2/favicons)
+           ?domain=youtube.com → o sitenin ikonunu döndürür
+           &sz=48 → 48x48 piksel boyutunda ister
+         Bu servis internet bağlantısı gerektirir; offline'da ikonlar görünmez.
+    -->
+    <div class="bookmarks">
+
+      <!-- YouTube -->
+      <a class="bookmark" href="https://www.youtube.com">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=48" alt="YouTube">
+        </div>
+        <span class="bookmark-label">YouTube</span>
+      </a>
+
+      <!-- GitHub -->
+      <a class="bookmark" href="https://github.com">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=github.com&sz=48" alt="GitHub">
+        </div>
+        <span class="bookmark-label">GıtHub</span>
+      </a>
+
+      <!-- Reddit -->
+      <a class="bookmark" href="https://www.reddit.com">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=reddit.com&sz=48" alt="Reddit">
+        </div>
+        <span class="bookmark-label">Reddıt</span>
+      </a>
+
+      <!-- X / Twitter -->
+      <a class="bookmark" href="https://x.com">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=x.com&sz=48" alt="X">
+        </div>
+        <span class="bookmark-label">X/Twıtter</span>
+      </a>
+
+      <!-- Gmail -->
+      <a class="bookmark" href="https://mail.google.com">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=mail.google.com&sz=48" alt="Gmail">
+        </div>
+        <span class="bookmark-label">Gmaıl</span>
+      </a>
+
+      <!-- Wikipedia -->
+      <a class="bookmark" href="https://www.wikipedia.org">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=wikipedia.org&sz=48" alt="Wikipedia">
+        </div>
+        <span class="bookmark-label">Wıkıpedıa</span>
+      </a>
+
+      <!-- Spotify -->
+      <a class="bookmark" href="https://open.spotify.com">
+        <div class="bookmark-icon">
+          <img src="https://www.google.com/s2/favicons?domain=spotify.com&sz=48" alt="Spotify">
+        </div>
+        <span class="bookmark-label">Spotıfy</span>
+      </a>
+
+    </div><!-- .bookmarks sonu -->
+
+  </div><!-- .content sonu -->
+
+  <!-- ── Alt Bar ───────────────────────────────────────────────────────────
+       position: fixed → .content'in dışında, sayfanın altına yapışık.
+       Fotoğraf kredisi: Unsplash lisansı gereği gösterilir (CC0 bile olsa iyi pratik).
+  -->
+  <div id="footer">
+    <span class="footer-brand">SX Browser</span>
+    <span id="credit">
+      Fotoğraf: <a href="https://unsplash.com/@jamie452" target="_blank">Jamie Fenn - Unsplash</a>
+    </span>
+  </div>
+
+  <script>
+    /*
+     * ── Türkçe Gün ve Ay İsimleri ──────────────────────────────────────────
+     * JavaScript'in Date nesnesi İngilizce döndürür.
+     * Türkçe göstermek için indeks tabanlı diziler kullanılır.
+     * DAYS[0] = 'Pazar' çünkü JS'de getDay() 0 = Pazar ile başlar.
+     */
+    const DAYS   = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+    const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+                    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+    /*
+     * tick() — Saat ve tarihi günceller
+     * ─────────────────────────────────
+     * Her çağrıldığında anlık zamanı alır ve DOM'u günceller.
+     * padStart(2, '0') → tek haneli saatleri "9:05" yerine "09:05" yapar.
+     * setInterval(tick, 1000) → her 1000ms (1 saniye) çağrılır.
+     * Hemen bir kez de çağrılır (tick()) → açılışta "00:00" gösterilmez.
+     */
+    function tick() {
+      const now = new Date();
+      const h   = String(now.getHours()).padStart(2, '0');
+      const m   = String(now.getMinutes()).padStart(2, '0');
+
+      document.getElementById('clock').textContent = h + ':' + m;
+      document.getElementById('date').textContent  =
+        DAYS[now.getDay()] + ',  ' + now.getDate() + ' ' + MONTHS[now.getMonth()];
+    }
+    tick();                      // Hemen bir kez çalıştır
+    setInterval(tick, 1000);    // Her saniye tekrarla
+
+    /*
+     * navigate() — Arama/gezinti mantığı
+     * ────────────────────────────────────
+     * Kullanıcının girdiği metni analiz eder ve uygun URL'ye yönlendirir.
+     *
+     * 1. http/https/file ile başlıyorsa → direkt URL olarak yükle
+     * 2. Nokta içeriyor ve boşluk yoksa → büyük ihtimalle domain (github.com gibi)
+     *    → başına https:// ekleyerek yükle
+     * 3. Diğer durumlar → Google arama sorgusu olarak yükle
+     *    encodeURIComponent → Türkçe karakter ve özel karakterleri URL'e uygun encode eder
+     *
+     * location.href → mevcut sayfayı yeni URL'ye yönlendirir.
+     * Bu kod file:// üzerinde çalışırken browser (v27).py sayfayı yükler.
+     */
+    function navigate() {
+      const val = document.getElementById('search').value.trim();
+      if (!val) return;  // Boş girişte hiçbir şey yapma
+
+      let url;
+      if (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('file://')) {
+        url = val;                              // Zaten tam URL
+      } else if (val.includes('.') && !val.includes(' ')) {
+        url = 'https://' + val;                // Domain gibi görünüyor
+      } else {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(val);  // Arama
+      }
+
+      location.href = url;
+    }
+
+    /*
+     * Olay Dinleyicileri
+     * ───────────────────
+     * keydown → Enter tuşuna basılınca navigate() çağrılır.
+     *   'keydown' kullanılır 'keypress' yerine (daha güvenilir, tüm tarayıcılarda çalışır).
+     * click → Arama butonu tıklanınca navigate() çağrılır.
+     */
+    document.getElementById('search').addEventListener('keydown', e => {
+      if (e.key === 'Enter') navigate();
+    });
+    document.getElementById('searchBtn').addEventListener('click', navigate);
+  </script>
+</body>
+
+</html>
