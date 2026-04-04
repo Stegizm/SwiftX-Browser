@@ -23,11 +23,15 @@ jobs:
           python-version: '3.11'
 
       - name: Bağımlılıkları kur
-        run: pip install pyinstaller PySide6
+        run: pip install pyinstaller PySide6 Pillow
+
+      - name: PNG ikonu ICO'ya dönüştür
+        run: |
+          python -c "from PIL import Image; img = Image.open('SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
 
       - name: PyInstaller ile derle
         run: |
-          pyinstaller --onefile --windowed --name "SwiftX" --icon "SXBETALOGO3.png" "browser (v27).py"
+          pyinstaller --onefile --windowed --name "SwiftX" --icon "SXBETALOGO3.ico" "browser (v27).py"
 
       - name: Ek dosyaları dist klasörüne kopyala
         run: |
