@@ -690,7 +690,14 @@ class MainWindow(QMainWindow):
 
         _here = _find_data()
         _html = os.path.join(_here, "home (v6).html")
-        self.HOME = ("file://" + _html) if os.path.exists(_html) else "https://www.startpage.com"
+        if os.path.exists(_html):
+            # Windows'ta file:///C:/... Linux'ta file:///home/... formatı gerekir
+            _html_url = _html.replace("\\", "/")
+            if not _html_url.startswith("/"):
+                _html_url = "/" + _html_url  # Windows: C:/... → /C:/...
+            self.HOME = "file://" + _html_url
+        else:
+            self.HOME = "https://www.startpage.com"
 
         self._bookmarks = _load(BM_FILE, [])
         self._history   = _load(HIST_FILE, [])
