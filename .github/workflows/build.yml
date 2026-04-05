@@ -24,7 +24,7 @@ jobs:
 
       - name: PNG ikonu ICO'ya dönüştür
         run: |
-          python -c "from PIL import Image; img = Image.open('SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
+          python -c "from PIL import Image; img = Image.open('data/SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
 
       - name: PyInstaller ile derle
         run: pyinstaller SwiftX.spec
@@ -63,7 +63,7 @@ jobs:
 
       - name: PNG ikonu ICO'ya dönüştür
         run: |
-          python -c "from PIL import Image; img = Image.open('SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
+          python -c "from PIL import Image; img = Image.open('data/SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
 
       - name: PyInstaller ile derle
         run: pyinstaller SwiftX.spec
@@ -110,7 +110,7 @@ jobs:
 
             ### İndirme / Download
             - **Windows**: `SwiftX-Windows.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
-            - **Linux**: `SwiftX-Linux.zip` → zip'i aç, terminalde `chmod +x SwiftX && ./SwiftX` (ya da SwiftX dosyasını çalıştırın)
+            - **Linux**: `SwiftX-Linux.zip` → zip'i aç, terminalde `chmod +x SwiftX && ./SwiftX`
 
             > ⚠️ Windows'ta "Akıllı Uygulama Denetimi" uyarısı çıkarsa:
             > "Daha fazla bilgi edin" → "Yine de çalıştır"
@@ -126,3 +126,4 @@ jobs:
           files: |
             SwiftX-Windows.zip
             SwiftX-Linux.zip
+
