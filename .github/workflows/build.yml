@@ -30,10 +30,13 @@ jobs:
         run: pyinstaller SwiftX.spec
 
       - name: data klasörünü exe yanına taşı
-        run: Copy-Item -Recurse data dist\SwiftX\data
+        run: Copy-Item -Recurse -Force data dist\SwiftX\data
+
+      - name: Zip içeriğini kontrol et
+        run: Get-ChildItem -Recurse dist\SwiftX
 
       - name: Zip oluştur
-        run: Compress-Archive -Path dist/SwiftX/* -DestinationPath SwiftX-Windows.zip
+        run: Compress-Archive -Path dist\SwiftX -DestinationPath SwiftX-Windows.zip
 
       - name: Windows artifact yükle
         uses: actions/upload-artifact@v4
@@ -108,6 +111,9 @@ jobs:
           body: |
             ## SwiftX v0.27.1-openAlpha
 
+            ### 🆕 Bu Sürümde Neler Değişti
+            - İlk openAlpha sürümü
+
             ### İndirme / Download
             - **Windows**: `SwiftX-Windows.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
             - **Linux**: `SwiftX-Linux.zip` → zip'i aç, terminalde `chmod +x SwiftX && ./SwiftX`
@@ -126,4 +132,3 @@ jobs:
           files: |
             SwiftX-Windows.zip
             SwiftX-Linux.zip
-
