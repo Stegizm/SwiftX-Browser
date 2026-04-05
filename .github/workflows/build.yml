@@ -1,8 +1,5 @@
 name: SwiftX Build
 
-# Ne zaman çalışır:
-# - main branch'e push yapılınca
-# - GitHub'da manuel olarak "Run workflow" butonuna basılınca
 on:
   push:
     branches: [ main ]
@@ -10,7 +7,7 @@ on:
 
 jobs:
 
-  # ── Windows Build ──────────────────────────────────────────────────────────
+  # ── Windows Build ────────────────────────────────────────────────────────
   build-windows:
     runs-on: windows-latest
     steps:
@@ -30,22 +27,21 @@ jobs:
           python -c "from PIL import Image; img = Image.open('SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
 
       - name: PyInstaller ile derle
-        run: |
-          pyinstaller --onefile --windowed --name "SwiftX" --icon "SXBETALOGO3.ico" "browser (v27).py"
+        run: pyinstaller SwiftX.spec
 
-      - name: Ek dosyaları dist klasörüne kopyala
-        run: |
-          copy "bg.jpg" "dist\bg.jpg"
-          copy "home (v6).html" "dist\home (v6).html"
-          copy "SXBETALOGO3.png" "dist\SXBETALOGO3.png"
+      - name: data klasörünü exe yanına taşı
+        run: Copy-Item -Recurse data dist\SwiftX\data
+
+      - name: Zip oluştur
+        run: Compress-Archive -Path dist/SwiftX/* -DestinationPath SwiftX-Windows.zip
 
       - name: Windows artifact yükle
         uses: actions/upload-artifact@v4
         with:
           name: SwiftX-Windows
-          path: dist/
+          path: SwiftX-Windows.zip
 
-  # ── Linux Build ────────────────────────────────────────────────────────────
+  # ── Linux Build ──────────────────────────────────────────────────────────
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -63,26 +59,29 @@ jobs:
           sudo apt-get install -y libgl1 libegl1 libxcb-cursor0 libxkbcommon-x11-0
 
       - name: Bağımlılıkları kur
-        run: pip install pyinstaller PySide6
+        run: pip install pyinstaller PySide6 Pillow
+
+      - name: PNG ikonu ICO'ya dönüştür
+        run: |
+          python -c "from PIL import Image; img = Image.open('SXBETALOGO3.png'); img.save('SXBETALOGO3.ico')"
 
       - name: PyInstaller ile derle
-        run: |
-          pyinstaller --onefile --windowed --name "SwiftX" "browser (v27).py"
+        run: pyinstaller SwiftX.spec
 
-      - name: Ek dosyaları dist klasörüne kopyala
-        run: |
-          cp "bg.jpg" "dist/bg.jpg"
-          cp "home (v6).html" "dist/home (v6).html"
-          cp "SXBETALOGO3.png" "dist/SXBETALOGO3.png"
+      - name: data klasörünü exe yanına taşı
+        run: cp -r data dist/SwiftX/data
+
+      # dist/SwiftX/ klasörünü zip'le
+      - name: Zip oluştur
+        run: cd dist && zip -r ../SwiftX-Linux.zip SwiftX/
 
       - name: Linux artifact yükle
         uses: actions/upload-artifact@v4
         with:
           name: SwiftX-Linux
-          path: dist/
+          path: SwiftX-Linux.zip
 
-  # ── Release Oluştur ────────────────────────────────────────────────────────
-  # Her iki build tamamlanınca otomatik GitHub Release açar
+  # ── Release Oluştur ──────────────────────────────────────────────────────
   release:
     needs: [ build-windows, build-linux ]
     runs-on: ubuntu-latest
@@ -93,18 +92,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: SwiftX-Windows
-          path: windows/
+          path: ./
 
       - name: Linux artifact indir
         uses: actions/download-artifact@v4
         with:
           name: SwiftX-Linux
-          path: linux/
-
-      - name: Zip oluştur
-        run: |
-          cd windows && zip -r ../SwiftX-Windows.zip . && cd ..
-          cd linux   && zip -r ../SwiftX-Linux.zip .   && cd ..
+          path: ./
 
       - name: GitHub Release yayınla
         uses: softprops/action-gh-release@v2
@@ -115,12 +109,20 @@ jobs:
             ## SwiftX v0.27.1-openAlpha
 
             ### İndirme / Download
-            - **Windows**: `SwiftX-Windows.zip` → `SwiftX.exe` dosyasını çalıştır
-            - **Linux**: `SwiftX-Linux.zip` → `SwiftX` dosyasını çalıştır
+            - **Windows**: `SwiftX-Windows.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
+            - **Linux**: `SwiftX-Linux.zip` → zip'i aç, terminalde `chmod +x SwiftX && ./SwiftX` (ya da SwiftX dosyasını çalıştırın)
+
+            > ⚠️ Windows'ta "Akıllı Uygulama Denetimi" uyarısı çıkarsa:
+            > "Daha fazla bilgi edin" → "Yine de çalıştır"
+
+            ### Bilinen Sorunlar (v0.27.2'de düzeltilecek)
+            - Google hizmetlerinde "güvenli değil" hatası
+            - YouTube videoları donabiliyor
+            - Ayarlar/geçmiş menülerinde açılış animasyonu yok
 
             ### Notlar
-            - bg.jpg, home (v6).html ve SXBETALOGO3.png dosyaları executable ile aynı klasörde olmalı
             - Bu bir openAlpha sürümüdür, hatalar olabilir
+            - Made with 💜 by YD Studio Team
           files: |
             SwiftX-Windows.zip
             SwiftX-Linux.zip
