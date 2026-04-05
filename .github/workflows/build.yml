@@ -109,10 +109,10 @@ jobs:
       - name: GitHub Release yayınla
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.27-openAlpha
-          name: "SwiftX v0.27-openAlpha"
+          tag_name: v0.27.1-openAlpha
+          name: "SwiftX v0.27.1-openAlpha"
           body: |
-            ## SwiftX v0.27-openAlpha
+            ## SwiftX v0.27.1-openAlpha
 
             ### İndirme / Download
             - **Windows**: `SwiftX-Windows.zip` → `SwiftX.exe` dosyasını çalıştır
