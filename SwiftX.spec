@@ -6,11 +6,7 @@ a = Analysis(
     ['browser (v27).py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ('data/bg.jpg', 'data'),
-        ('data/home (v6).html', 'data'),
-        ('data/SXBETALOGO3.png', 'data'),
-    ],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
