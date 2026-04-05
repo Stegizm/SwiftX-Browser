@@ -2,7 +2,7 @@
 SwiftX Browser (v0.27)
 # Gereksinim: pip install PySide6
 
-# Eklemeyi hedeflediklerim: home class
+# Eklemeyi hedeflediklerim:
 -AutoDarkMode ✓
 -AdBlocker ✓
 -ayarlar menüsü ✓
@@ -28,6 +28,13 @@ from PySide6.QtWebEngineCore import (
 )
 from PySide6.QtCore import QUrl, Qt, QTimer, QSize, QPoint, QObject
 from PySide6.QtGui import QAction, QColor, QPalette, QCursor, QWheelEvent, QIcon
+
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS  # Paket içindeki geçici klasör
+    except Exception:
+        base_path = os.path.abspath(".") # Normal çalışma klasörü
+    return os.path.join(base_path, relative_path)
 
 SIDEBAR_W  = 48
 DATA_DIR   = os.path.expanduser("~/.swiftx")
@@ -99,8 +106,6 @@ DEFAULT_EXTENSIONS = [
         "version": "1.2.0"
     },
 ]
-
-os.makedirs(DATA_DIR, exist_ok=True)
 
 def _load(path, default):
     try:
@@ -661,7 +666,29 @@ class ExtensionStore(QDialog):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        _here = os.path.dirname(os.path.abspath(__file__))
+
+        # Kaynak dosyaların yolunu güvenilir şekilde bul
+        def _find_data():
+            if getattr(sys, 'frozen', False):
+                # onedir: exe'nin yanındaki data/ klasörü
+                base = os.path.dirname(sys.executable)
+                candidate = os.path.join(base, 'data')
+                if os.path.isdir(candidate):
+                    return candidate
+                # Yedek: _internal/ içindeki data/
+                candidate2 = os.path.join(base, '_internal', 'data')
+                if os.path.isdir(candidate2):
+                    return candidate2
+                return base
+            else:
+                # Normal .py olarak çalışırken data/ klasörüne bak
+                base = os.path.dirname(os.path.abspath(__file__))
+                candidate = os.path.join(base, 'data')
+                if os.path.isdir(candidate):
+                    return candidate
+                return base  # data/ yoksa .py'nin yanına bak
+
+        _here = _find_data()
         _html = os.path.join(_here, "home (v6).html")
         self.HOME = ("file://" + _html) if os.path.exists(_html) else "https://www.startpage.com"
 
