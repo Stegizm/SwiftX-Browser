@@ -30,13 +30,19 @@ jobs:
         run: pyinstaller SwiftX.spec
 
       - name: data klasörünü exe yanına taşı
-        run: Copy-Item -Recurse -Force data dist\SwiftX\data
+        run: |
+          New-Item -ItemType Directory -Force -Path dist\SwiftX\data
+          Copy-Item -Force data\bg.jpg dist\SwiftX\data\bg.jpg
+          Copy-Item -Force "data\home (v6).html" "dist\SwiftX\data\home (v6).html"
+          Copy-Item -Force data\SXBETALOGO3.png dist\SwiftX\data\SXBETALOGO3.png
 
       - name: Zip içeriğini kontrol et
         run: Get-ChildItem -Recurse dist\SwiftX
 
       - name: Zip oluştur
-        run: Compress-Archive -Path dist\SwiftX -DestinationPath SwiftX-Windows.zip
+        run: |
+          cd dist
+          Compress-Archive -Path SwiftX -DestinationPath ..\SwiftX-Windows.zip
 
       - name: Windows artifact yükle
         uses: actions/upload-artifact@v4
