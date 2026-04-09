@@ -1,4 +1,3 @@
-
 name: SwiftX Build
 
 on:
@@ -33,7 +32,7 @@ jobs:
       # Ekstra kopyalama yapmaya gerek yok
 
       - name: Zip oluştur
-        run: Compress-Archive -Path dist\SwiftX\* -DestinationPath SwiftX-Windows.zip
+        run: Compress-Archive -Path dist\SwiftX\* -DestinationPath SX-272-Windows2.zip
 
       - name: Windows artifact yükle
         uses: actions/upload-artifact@v4
@@ -71,7 +70,7 @@ jobs:
       # Ekstra kopyalama yapmaya gerek yok
 
       - name: Zip oluştur
-        run: cd dist && zip -r ../SwiftX-Linux.zip SwiftX/
+        run: cd dist && zip -r ../SX-272-Linux2.zip SwiftX/
 
       - name: Linux artifact yükle
         uses: actions/upload-artifact@v4
@@ -89,13 +88,13 @@ jobs:
       - name: Windows artifact indir
         uses: actions/download-artifact@v4
         with:
-          name: SwiftX-Windows
+          name: SX-272-Windows2
           path: ./
 
       - name: Linux artifact indir
         uses: actions/download-artifact@v4
         with:
-          name: SwiftX-Linux
+          name: SX-272-Linux2
           path: ./
 
       - name: GitHub Release yayınla
@@ -104,11 +103,11 @@ jobs:
           tag_name: v0.27.2-alpha
           name: "SwiftX v0.27.2"
           body: |
-            ## v0.27.2-alpha- Mini Update 2
+            ## v0.27.2-alpha - Mini Update 2
 
             ### İndirme / Download
-            - **Windows**: `SwiftX-Windows.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
-            - **Linux**: `SwiftX-Linux.zip` → zip'i aç, terminalde `chmod +x SwiftX && ./SwiftX`
+            - **Windows**: `SX-272-Windows2.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
+            - **Linux**: `SX-272-Linux2.zip` → zip'i aç, terminalde `chmod +x SwiftX && ./SwiftX`
 
             > ⚠️ Windows'ta "Akıllı Uygulama Denetimi" uyarısı çıkarsa:
             > "Daha fazla bilgi edin" → "Yine de çalıştır"
@@ -117,12 +116,6 @@ jobs:
             - Google hizmetlerinde "güvenli değil" hatası
             - YouTube videoları donabiliyor
             - Ayarlar/geçmiş menülerinde açılış animasyonu yok
-
-            
-            ### Bu sürümdeki yenilikler
-            - bazı yaygın hatalar düzeltildi.
-            - Dosya düzeni değiştirildi.
-            - kodun daha sağlıklı çalışması adına temel atıldı.
 
             ### Notlar
             - Bu bir openAlpha sürümüdür, hatalar olabilir
