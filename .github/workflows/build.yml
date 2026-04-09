@@ -1,3 +1,4 @@
+
 name: SwiftX Build
 
 on:
@@ -28,9 +29,8 @@ jobs:
 
       - name: PyInstaller ile derle
         run: pyinstaller SwiftX.spec
-
-      - name: data klasörünü exe yanına taşı
-        run: Copy-Item -Recurse data dist\SwiftX\data
+      # data/ klasörü spec'teki datas= ile _internal/ içine otomatik ekleniyor
+      # Ekstra kopyalama yapmaya gerek yok
 
       - name: Zip oluştur
         run: Compress-Archive -Path dist\SwiftX\* -DestinationPath SwiftX-Windows.zip
@@ -67,11 +67,9 @@ jobs:
 
       - name: PyInstaller ile derle
         run: pyinstaller SwiftX.spec
+      # data/ klasörü spec'teki datas= ile _internal/ içine otomatik ekleniyor
+      # Ekstra kopyalama yapmaya gerek yok
 
-      - name: data klasörünü exe yanına taşı
-        run: cp -r data dist/SwiftX/data
-
-      # dist/SwiftX/ klasörünü zip'le
       - name: Zip oluştur
         run: cd dist && zip -r ../SwiftX-Linux.zip SwiftX/
 
@@ -103,10 +101,10 @@ jobs:
       - name: GitHub Release yayınla
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.27.2-alpha
-          name: "SwiftX v0.27.2-alpha"
+          tag_name: v0.27.2-openAlpha
+          name: "SwiftX v0.27.2-openAlpha"
           body: |
-            ## SwiftX v0.27.2-alpha
+            ## SwiftX v0.27.2-openAlpha
 
             ### İndirme / Download
             - **Windows**: `SwiftX-Windows.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
@@ -124,5 +122,5 @@ jobs:
             - Bu bir openAlpha sürümüdür, hatalar olabilir
             - Made with 💜 by YD Studio Team
           files: |
-            SwiftX-Windows.zip
-            SwiftX-Linux.zip
+            SX-272-Windows2.zip
+            SX-272-Linux2.zip
