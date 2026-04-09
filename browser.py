@@ -5,11 +5,7 @@ SwiftX Browser — giriş noktası.
 Kullanım:
     python browser.py
 """
-
-import sys
-import os
-
-# Proje kök dizinini Python yoluna ekle (paketlenmiş hâl için de gerekebilir)
+import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from PySide6.QtWidgets import QApplication
