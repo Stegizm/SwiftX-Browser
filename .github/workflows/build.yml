@@ -103,7 +103,7 @@ jobs:
           tag_name: v0.27.2-alpha
           name: "SwiftX v0.27.2"
           body: |
-            ## v0.27.2-alpha - Mini Update 2
+            ## v0.27.2-alpha: Mini Update 2
 
             ### İndirme / Download
             - **Windows**: `SX-272-Windows2.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
