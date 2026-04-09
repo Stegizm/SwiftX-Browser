@@ -38,8 +38,8 @@ jobs:
       - name: Windows artifact yükle
         uses: actions/upload-artifact@v4
         with:
-          name: SwiftX-Windows
-          path: SwiftX-Windows.zip
+          name: SX-272-Windows2
+          path: SX-272-Windows2.zip
 
   # ── Linux Build ──────────────────────────────────────────────────────────
   build-linux:
@@ -76,8 +76,8 @@ jobs:
       - name: Linux artifact yükle
         uses: actions/upload-artifact@v4
         with:
-          name: SwiftX-Linux
-          path: SwiftX-Linux.zip
+          name: SX-272-Linux2
+          path: SX-272-Linux2.zip
 
   # ── Release Oluştur ──────────────────────────────────────────────────────
   release:
@@ -101,10 +101,10 @@ jobs:
       - name: GitHub Release yayınla
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.27.2-openAlpha
-          name: "SwiftX v0.27.2-openAlpha"
+          tag_name: v0.27.2-alpha
+          name: "SwiftX v0.27.2"
           body: |
-            ## SwiftX v0.27.2-openAlpha
+            ## v0.27.2-alpha- Mini Update 2
 
             ### İndirme / Download
             - **Windows**: `SwiftX-Windows.zip` → zip'i aç, `SwiftX.exe` dosyasını çalıştır
