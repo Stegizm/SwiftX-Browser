@@ -1,39 +1,40 @@
 # SwiftX.spec
-# PyInstaller spec dosyası — onedir
-# Tek exe yerine klasör yapısı üretir, daha hızlı ve kararlı çalışır
+# Baştan yapılandırılmış, hata gidermeye odaklı onedir spec dosyası
 
 import os
+import sys
+from PyInstaller.utils.hooks import collect_submodules
+
 block_cipher = None
+proje_dizini = os.path.abspath('.')
+
+# Tüm alt modülleri otomatik olarak topla (Manuel yazım hatasını önler)
+gizli_moduller = collect_submodules('windows') + \
+                 collect_submodules('ui') + \
+                 collect_submodules('engine') + \
+                 collect_submodules('core') + \
+                 ['PySide6.QtWebEngineWidgets', 'PySide6.QtWebEngineCore']
 
 a = Analysis(
     ['browser.py'],
-    pathex=[os.path.abspath('.')],          # proje kök dizini her zaman aranır
+    pathex=[proje_dizini],
     binaries=[],
     datas=[
-        ('data/bg.jpg', 'data'),
-        ('data/home (v6).html', 'data'),
-        ('data/SXBETALOGO3.png', 'data'),
+        ('data', 'data'),               # data klasörünü olduğu gibi kopyalar
+        ('windows', 'windows'),         # windows klasörünü ana dizine ekler
+        ('ui', 'ui'),                   # ui klasörünü ana dizine ekler
+        ('engine', 'engine'),           # engine klasörünü ana dizine ekler
+        ('core', 'core'),               # core klasörünü ana dizine ekler
     ],
-    hiddenimports=[
-        'PySide6.QtWebEngineWidgets',
-        'PySide6.QtWebEngineCore',
-        'windows.main_window',
-        'ui.tab_widget',
-        'ui.extension_store',
-        'ui.side_panel',
-        'engine.browser_page',
-        'engine.ad_blocker',
-        'engine.scripts',
-        'core.constants',
-        'core.storage',
-        'core.styles',
-    ],
+    hiddenimports=gizli_moduller,       # Otomatik toplanan modülleri ekler
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
-    noarchive=False,
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
     cipher=block_cipher,
+    noarchive=False,
 )
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
@@ -42,28 +43,28 @@ exe = EXE(
     pyz,
     a.scripts,
     [],
-    exclude_binaries=True,   # onedir için True olmalı
+    exclude_binaries=True,              # onedir modu için gereklidir
     name='SwiftX',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,
+    console=False,                      # GUI uygulaması olduğu için konsol kapalı
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='SXBETALOGO3.ico',
+    icon='SXBETALOGO3.ico',             # İkon dosyası
 )
 
-# COLLECT → onedir modunu etkinleştirir, tüm dosyaları dist/SwiftX/ altında toplar
 coll = COLLECT(
     exe,
     a.binaries,
+    a.zipfiles,
     a.datas,
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='SwiftX',
+    name='SwiftX',                      # dist/SwiftX/ altında toplanır
 )
