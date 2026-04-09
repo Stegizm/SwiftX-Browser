@@ -17,7 +17,7 @@
 ### About
 SwiftX is a hobby browser project built on top of Qt WebEngine. It started as a personal experiment to learn how browsers work under the hood.
 
-**Current version:** `v0.28-alpha`
+**Current version:** `v0.27.2-alpha`
 
 ### Features
 - 🚫 Ad Blocker
@@ -70,7 +70,7 @@ python browser.py
 ### Hakkında
 SwiftX, Qt WebEngine üzerine inşa edilmiş bir hobi tarayıcı projesidir. Tarayıcıların arka planda nasıl çalıştığını öğrenmek için kişisel bir deney olarak başladı.
 
-**Mevcut sürüm:** `v0.28-alpha`
+**Mevcut sürüm:** `v0.27.2-alpha`
 
 ### Özellikler
 - 🚫 Reklam Engelleyici
