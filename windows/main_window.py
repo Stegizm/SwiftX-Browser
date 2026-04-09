@@ -1,7 +1,7 @@
 ""
-windows/main_window.py
-Ana pencere — artık sadece koordinasyon yapar.
-Tüm alt bileşenler ayrı modüllerde; bu sınıf onları birbirine bağlar.
+# windows/main_window.py
+# Ana pencere — artık sadece koordinasyon yapar.
+# Tüm alt bileşenler ayrı modüllerde; bu sınıf onları birbirine bağlar.
 """
 
 import os
