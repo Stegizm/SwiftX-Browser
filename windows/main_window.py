@@ -1,9 +1,6 @@
-""
 # windows/main_window.py
 # Ana pencere — artık sadece koordinasyon yapar.
 # Tüm alt bileşenler ayrı modüllerde; bu sınıf onları birbirine bağlar.
-"""
-
 import os
 import sys
 from datetime import datetime
