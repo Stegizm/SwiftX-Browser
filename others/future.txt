@@ -1,0 +1,22 @@
+for v0.28 Patchs:
+- Linuxta google hizmetleri açılamıyor: tarayıcı güvenli değil hatası
+- Linuxta youtube videosu açıldığında bozulması: site donuyor veya sapıtıyor
+- JS desteği  kısmen eksik
+- ayarlar/indirilenler/geçmiş vs. menüsü açılırken side-up animasyonu yok
+- [ÇÖZÜLDÜ] Windows tarafında home.html ve logolar gözükmüyor 
+- mikrofon desteği yok
+- yeni sekme kapatma işlemi sonrası memory leak riski
+- Bazı Windowslarda oluyor: Windows tarafında side bar kapanıp-açılmıyor 
+- Auto Dark mode kapatılmıyor (2)
+- Read mode çalışmıyor (2)
+- Arkaplan değiştirme seçeneği yok (3)
+- Windows: üst beyaz bar temayı bozuyor
+- Windows: üst bardaki başlık öncesi siteyi gösterebiliyor
+- yt tam ekran olmuyor
+- F11 tam ekran modu eksik
+- sekme kapatma butonu belki değiştirilebilir (3)
+- kişiselleştirme seçenekleri konabilir (3)
+- (...)
+2: İkincil, öncelikli olmayanlar
+3: Obsiyonel olanlar
+.
