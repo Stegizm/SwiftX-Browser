@@ -118,6 +118,12 @@ jobs:
             - YouTube videoları donabiliyor
             - Ayarlar/geçmiş menülerinde açılış animasyonu yok
 
+            
+            ### Bu sürümdeki yenilikler
+            - bazı yaygın hatalar düzeltildi.
+            - Dosya düzeni değiştirildi.
+            - kodun daha sağlıklı çalışması adına temel atıldı.
+
             ### Notlar
             - Bu bir openAlpha sürümüdür, hatalar olabilir
             - Made with 💜 by YD Studio Team
