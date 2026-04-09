@@ -32,13 +32,13 @@ jobs:
       # Ekstra kopyalama yapmaya gerek yok
 
       - name: Zip oluştur
-        run: Compress-Archive -Path dist\SwiftX\* -DestinationPath SX-272-Windows2.zip
+        run: Compress-Archive -Path dist\SwiftX\* -DestinationPath SX-272-Windows.zip
 
       - name: Windows artifact yükle
         uses: actions/upload-artifact@v4
         with:
-          name: SX-272-Windows2
-          path: SX-272-Windows2.zip
+          name: SX-272-Windows
+          path: SX-272-Windows.zip
 
   # ── Linux Build ──────────────────────────────────────────────────────────
   build-linux:
@@ -70,13 +70,13 @@ jobs:
       # Ekstra kopyalama yapmaya gerek yok
 
       - name: Zip oluştur
-        run: cd dist && zip -r ../SX-272-Linux2.zip SwiftX/
+        run: cd dist && zip -r ../SX-272-Linux.zip SwiftX/
 
       - name: Linux artifact yükle
         uses: actions/upload-artifact@v4
         with:
-          name: SX-272-Linux2
-          path: SX-272-Linux2.zip
+          name: SX-272-Linux
+          path: SX-272-Linux.zip
 
   # ── Release Oluştur ──────────────────────────────────────────────────────
   release:
@@ -88,13 +88,13 @@ jobs:
       - name: Windows artifact indir
         uses: actions/download-artifact@v4
         with:
-          name: SX-272-Windows2
+          name: SX-272-Windows
           path: ./
 
       - name: Linux artifact indir
         uses: actions/download-artifact@v4
         with:
-          name: SX-272-Linux2
+          name: SX-272-Linux
           path: ./
 
       - name: GitHub Release yayınla
@@ -121,5 +121,5 @@ jobs:
             - Bu bir openAlpha sürümüdür, hatalar olabilir
             - Made with 💜 by YD Studio Team
           files: |
-            SX-272-Windows2.zip
-            SX-272-Linux2.zip
+            SX-272-Windows.zip
+            SX-272-Linux.zip
