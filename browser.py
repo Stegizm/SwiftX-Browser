@@ -4,7 +4,15 @@ SwiftX Browser — giriş noktası.
 
 Kullanım:
     python browser.py
+    
 """
+# Uygulama paketlenmiş bir .exe ise çalışır
+if getattr(sys, 'frozen', False):
+    # _internal klasörünü Python'un arama yoluna (path) ekle
+    bundle_dir = os.path.join(sys._MEIPASS)
+    if bundle_dir not in sys.path:
+        sys.path.append(bundle_dir)
+        
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
