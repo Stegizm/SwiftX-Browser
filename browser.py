@@ -3,8 +3,7 @@ browser.py
 SwiftX Browser — giriş noktası.
 
 Kullanım:
-    python browser.py
-    
+    python browser.py  
 """
 # Uygulama dondurulmuş (frozen) olsa da olmasa da kök dizini ekleyelim
 current_dir = os.path.dirname(os.path.abspath(__file__))
