@@ -6,12 +6,16 @@ Kullanım:
     python browser.py
     
 """
-# Uygulama paketlenmiş bir .exe ise çalışır
+# Uygulama dondurulmuş (frozen) olsa da olmasa da kök dizini ekleyelim
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.append(current_dir)
+
+# PyInstaller'ın özel _internal dizinini de ekleyelim
 if getattr(sys, 'frozen', False):
-    # _internal klasörünü Python'un arama yoluna (path) ekle
-    bundle_dir = os.path.join(sys._MEIPASS)
-    if bundle_dir not in sys.path:
-        sys.path.append(bundle_dir)
+    base_path = sys._MEIPASS
+    if base_path not in sys.path:
+        sys.path.append(base_path)
         
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
