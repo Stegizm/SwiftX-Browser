@@ -79,9 +79,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: SwiftX Browser v0.28
+          name: v0.28-beta
           body: |
-            ## SwiftX Browser v0.28
+            ## SwiftX v0.28
 
             ### Yenilikler
             - God Object refactor: MainWindow parçalara ayrildi
@@ -95,10 +95,6 @@ jobs:
             |----------|-------|
             | Linux x86_64 | `SwiftX-v0.28-linux-x86_64.tar.gz` |
             | Windows x86_64 | `SwiftX-v0.28-windows-x86_64.zip` |
-
-            ### Calistirma
-            - **Linux**: Arşivi çikart, `./SwiftX/SwiftX` çalistir
-            - **Windows**: Arşivi çikart, `SwiftX\SwiftX.exe` çalistir
 
             ---
             Made with 💜 by YD Studio Team
