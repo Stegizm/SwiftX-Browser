@@ -79,9 +79,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: v0.28-beta
+          name: SwiftX v0.28
           body: |
-            ## SwiftX v0.28
+            ## v0.28-beta: General Fixes
 
             ### Yenilikler
             - God Object refactor: MainWindow parçalara ayrildi
