@@ -1,0 +1,111 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: SwiftX-v0.28-linux-x86_64
+            asset_name: SwiftX-v0.28-linux-x86_64.tar.gz
+          - os: windows-latest
+            artifact: SwiftX-v0.28-windows-x86_64
+            asset_name: SwiftX-v0.28-windows-x86_64.zip
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install system deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxkbcommon-x11-0 libxcb-xinerama0 libxcb-cursor0 libegl1 libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2 libatspi2.0-0
+
+      - name: Install Python deps
+        run: |
+          pip install --upgrade pip
+          pip install PySide6==6.8.1 pyinstaller==6.11.1
+
+      - name: Build with PyInstaller
+        run: pyinstaller SwiftX.spec --distpath dist --workpath build --clean -y
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cd dist
+          tar -czf ${{ matrix.asset_name }} SwiftX/
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist/SwiftX/* -DestinationPath dist/${{ matrix.asset_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: List artifacts
+        run: find artifacts/ -type f
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: SwiftX Browser v0.28
+          body: |
+            ## SwiftX Browser v0.28
+
+            ### Yenilikler
+            - God Object refactor: MainWindow parçalara ayrildi
+            - Yeni servis katmani: BookmarkManager, HistoryManager, DownloadManager, SettingsManager
+            - Sidebar, Settings Panel, Bookmark Bar bagimsiz UI bilesenlerine ayrildi
+            - Import hatasi ve duplicate permission handling duzeltildi
+            - DRY toggle pattern uygulandi
+
+            ### Indirme
+            | Platform | Dosya |
+            |----------|-------|
+            | Linux x86_64 | `SwiftX-v0.28-linux-x86_64.tar.gz` |
+            | Windows x86_64 | `SwiftX-v0.28-windows-x86_64.zip` |
+
+            ### Calistirma
+            - **Linux**: Arşivi çikart, `./SwiftX/SwiftX` çalistir
+            - **Windows**: Arşivi çikart, `SwiftX\SwiftX.exe` çalistir
+
+            ---
+            Made with 💜 by YD Studio Team
+          draft: false
+          prerelease: false
+          files: |
+            artifacts/**/SwiftX-v0.28-linux-x86_64.tar.gz
+            artifacts/**/SwiftX-v0.28-windows-x86_64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# PyInstaller
+*.spec
+
+# OS
+.DS_Store
+Thumbs.db
+
+# User data (runtime only, never committed)
+~/.swiftx/
+
+# Build artifacts
+*.exe
+*.app
+*.dmg
+
+# Misc
+*.log
+PY2.code-workspace
+explained ones/
+others/

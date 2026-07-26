@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "swiftx-browser"
+version = "0.28.0"
+description = "Hızlı, güvenli ve açık kaynaklı tarayıcı denemesi"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = [
+    "PySide6>=6.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "pyinstaller>=6.0",
+]
+
+[project.scripts]
+swiftx = "browser:main"
+
+[tool.setuptools.packages.find]
+include = ["core*", "engine*", "ui*", "windows*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
