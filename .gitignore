@@ -19,7 +19,6 @@ env/
 *~
 
 # PyInstaller
-*.spec
 
 # OS
 .DS_Store
