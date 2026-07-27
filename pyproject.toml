@@ -4,7 +4,7 @@ build-backend = "setuptools.backends._legacy:_Backend"
 
 [project]
 name = "swiftx-browser"
-version = "0.28.0"
+version = "0.28.1-2"
 description = "Hızlı, güvenli ve açık kaynaklı tarayıcı denemesi"
 readme = "README.md"
 license = {text = "MIT"}

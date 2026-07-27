@@ -32,6 +32,7 @@ class SettingsPanelWidget(QWidget):
         self._add_toggle_row(layout, "🎯 Smooth Scroll",          "smooth_scroll",        settings.smooth_scroll,        on_toggle)
         self._add_toggle_row(layout, "🌙 Auto Dark Mode",         "dark_mode",            settings.dark_mode,            on_toggle)
         self._add_toggle_row(layout, "💾 Son Oturumu Geri Yükle", "restore_session",      settings.restore_session,      on_toggle)
+        self._add_toggle_row(layout, "💤 Sekme Uyutma",           "tab_hibernate",        settings.tab_hibernate,        on_toggle)
 
         clear_btn = QPushButton("🗑  Tüm Geçmiş Temizle")
         clear_btn.setStyleSheet(
@@ -43,10 +44,11 @@ class SettingsPanelWidget(QWidget):
         layout.addWidget(clear_btn)
 
         about = QLabel(
-            " ℹ SwiftX Browser v0.28\n\n"
+            " ℹ SwiftX Browser v0.28.1\n\n"
             "Hızlı, Güvenli ve Açık Kaynaklı Tarayıcı Denemesi\n\n"
             "✓ Reklam Engelleyici  ✓ Smooth Scroller\n"
             "✓ Auto Dark Mode      ✓ Session Recovery\n"
+            "✓ Sekme Uyutma        ✓ Geleneksel Sekme Düzeni\n"
             "✓ Eklenti Merkezi     ✓ Yer İmleri & Geçmiş\n\n"
             "Made with 💜 by YD Studio Team"
         )

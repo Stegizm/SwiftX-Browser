@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec — SwiftX Browser v0.3
+"""PyInstaller spec — SwiftX Browser v0.28.1
 
 Kullanım:
     pyinstaller SwiftX.spec
@@ -30,6 +30,7 @@ a = Analysis(
         "engine.scripts",
         "engine.ad_blocker",
         "ui",
+        "ui.tab_bar",
         "ui.tab_widget",
         "ui.side_panel",
         "ui.sidebar",

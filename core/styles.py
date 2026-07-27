@@ -16,7 +16,7 @@ QMainWindow, QWidget {
     border-right: 1px solid #2a2930;
     color: #9e9db5; font-size: 17px;
     min-width: 40px; max-width: 40px;
-    min-height: 40px; max-height: 40px; padding: 0;
+    min-height: 36px; max-height: 36px; padding: 0;
 }
 #toggleBtn:hover   { background: #2a2930; color: #fbfbfe; }
 #toggleBtn:pressed { background: #35343e; }
@@ -30,32 +30,84 @@ QMainWindow, QWidget {
 }
 #sideBtn:hover   { background: #2a2930; color: #fbfbfe; }
 #sideBtn:pressed { background: #35343e; }
-#tabStrip { background: #1c1b22; min-height: 36px; max-height: 36px; }
-#tabBtn {
-    background: transparent; color: #9e9db5; border: none;
-    border-radius: 6px; padding: 0 10px; font-size: 12px;
-    min-height: 28px; max-height: 28px;
-    min-width: 80px; max-width: 200px;
-    text-align: left; margin: 4px 1px;
+
+/* ── Sekme çubuğu (geleneksel) ── */
+#tabStrip {
+    background: #1c1b22;
+    min-height: 36px;
+    max-height: 36px;
 }
-#tabBtn[active="true"] { background: #2a2930; color: #fbfbfe; }
-#tabBtn:hover:!pressed { background: #252430; color: #c8c7de; }
+#tabScrollArea {
+    background: #1c1b22;
+    border: none;
+}
+#tabScrollContent {
+    background: #1c1b22;
+}
+#tabItem {
+    background: transparent;
+    border-top: 2px solid transparent;
+    border-radius: 8px 8px 0 0;
+    max-width: 220px;
+    min-width: 100px;
+    margin: 0 1px 0 1px;
+}
+#tabItem:hover {
+    background: #252430;
+}
+#tabItem[active="true"] {
+    border-top: 2px solid #5b5bef;
+    background: #252430;
+}
+#tabTitleBtn {
+    background: transparent;
+    color: #9e9db5;
+    border: none;
+    border-radius: 6px 6px 0 0;
+    padding: 0 4px;
+    font-size: 12px;
+    min-height: 28px;
+    max-height: 28px;
+    text-align: left;
+}
+#tabTitleBtn[active="true"] {
+    color: #fbfbfe;
+}
+#tabTitleBtn:hover {
+    color: #c8c7de;
+}
 #tabCloseBtn {
-    background: transparent; color: transparent; border: none;
-    border-radius: 4px; font-size: 10px;
-    min-width: 16px; max-width: 16px;
-    min-height: 16px; max-height: 16px;
-    padding: 0; margin: 0 2px 0 0;
+    background: transparent;
+    color: #6e6d85;
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    min-width: 18px;
+    max-width: 18px;
+    min-height: 18px;
+    max-height: 18px;
+    padding: 0;
 }
-#tabCloseBtn:hover { background: #3d3c4e; color: #c8c7de; }
+#tabCloseBtn:hover {
+    background: #3d3c4e;
+    color: #e74c3c;
+}
+#tabSleepIcon {
+    background: transparent;
+    border: none;
+    color: #6e6d85;
+    font-size: 8px;
+    padding: 0;
+}
 #newTabBtn {
     background: transparent; color: #6e6d85; border: none;
-    border-radius: 6px; font-size: 18px;
+    border-radius: 6px; font-size: 16px;
     min-width: 28px; max-width: 28px;
     min-height: 28px; max-height: 28px;
-    padding: 0; margin: 4px 4px;
+    padding: 0; margin: 0 2px;
 }
 #newTabBtn:hover { background: #2a2930; color: #c8c7de; }
+
 #navBar {
     background: #1c1b22; border-bottom: 1px solid #2a2930;
     min-height: 44px; max-height: 44px;

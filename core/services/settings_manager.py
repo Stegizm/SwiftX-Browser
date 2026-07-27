@@ -18,6 +18,7 @@ class SettingsManager:
         self._smooth_scroll: bool = True
         self._dark_mode: bool = True
         self._restore_session: bool = True
+        self._tab_hibernate: bool = True
         self._on_changed: Optional[Callable] = None
 
     # ── Public properties ──────────────────────────────────────────────────
@@ -42,8 +43,12 @@ class SettingsManager:
     def restore_session(self) -> bool:
         return self._restore_session
 
+    @property
+    def tab_hibernate(self) -> bool:
+        return self._tab_hibernate
+
     def set_on_changed(self, callback: Callable) -> None:
-        """Ayar değişikliğinde UI'yı güncellemek için kaydedilir."""
+        """Ayar değişikliğinde UI'ı güncellemek için kaydedilir."""
         self._on_changed = callback
 
     # ── Toggle helpers (DRY) ────────────────────────────────────────────────

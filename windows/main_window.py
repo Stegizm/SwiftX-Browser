@@ -3,6 +3,7 @@
 # İş mantığı core.services'a, UI bileşenleri ui/ modüllerine taşındı.
 import os
 import sys
+import time
 from datetime import datetime
 
 from PySide6.QtWidgets import (
@@ -26,12 +27,18 @@ from core.services.download_manager import DownloadManager
 from core.services.settings_manager import SettingsManager
 from engine.ad_blocker import AdBlocker
 from engine.browserpage import BrowserPage
-from ui.tab_widget import TabWidget
+from ui.tab_bar import TabBar, HIBERNATE_HTML
 from ui.extension_store import ExtensionStore
 from ui.side_panel import SidePanel
 from ui.sidebar import SidebarWidget
 from ui.settings_panel import SettingsPanelWidget
 from ui.bookmark_bar import BookmarkBar
+
+
+# ── Sekme uyutma sabitleri ─────────────────────────────────────────────────
+HIBERNATE_CHECK_INTERVAL = 30_000   # 30 saniyede bir kontrol
+HIBERNATE_IDLE_SECONDS = 300        # 5 dakika hiç dokunulmazsa uyut
+MIN_ACTIVE_TABS = 1                  # En az bu kadar sekme her zaman uyanık kalır
 
 
 class MainWindow(QMainWindow):
@@ -76,12 +83,20 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(STYLE)
 
         # ── Sekme durumu ─────────────────────────────────────────────────
-        self._tabs: list[tuple[TabWidget, BrowserPage]] = []
+        self._tabs: list[tuple[object, BrowserPage]] = []  # (TabItem, BrowserPage)
+        self._tab_last_active: dict[int, float] = {}       # idx → son aktif zamanı
+        self._hibernated_tabs: set[int] = set()            # uyutulmuş sekme index'leri
         self._active: int = -1
         self._panel_visible = False
 
         self._build_ui()
         self._load_session()
+
+        # ── Sekme uyutma zamanlayıcı ──────────────────────────────────────
+        self._hibernate_timer = QTimer(self)
+        self._hibernate_timer.setInterval(HIBERNATE_CHECK_INTERVAL)
+        self._hibernate_timer.timeout.connect(self._check_hibernation)
+        self._hibernate_timer.start()
 
     # ══════════════════════════════════════════════════════════════════════
     # Yardımcılar
@@ -179,23 +194,27 @@ class MainWindow(QMainWindow):
         return mid
 
     def _build_tab_strip(self) -> QWidget:
+        """Geleneksel sekme çubuğu: sol tarafta toggle, ortada kaydırılabilir sekmeler, sonda '+' butonu."""
         tab_strip = QWidget()
         tab_strip.setObjectName("tabStrip")
-        self._tl = QHBoxLayout(tab_strip)
-        self._tl.setContentsMargins(0, 0, 6, 0)
-        self._tl.setSpacing(0)
+        strip_h = QHBoxLayout(tab_strip)
+        strip_h.setContentsMargins(0, 0, 0, 0)
+        strip_h.setSpacing(0)
 
+        # Sol: Sidebar toggle
         self._toggle_btn = QPushButton("☰")
         self._toggle_btn.setObjectName("toggleBtn")
         self._toggle_btn.setToolTip("Sidebar Aç/Kapat (Ctrl+B)")
         self._toggle_btn.clicked.connect(self._toggle_sidebar)
-        self._tl.addWidget(self._toggle_btn)
-        self._tl.addStretch()
+        strip_h.addWidget(self._toggle_btn)
 
-        ntb = QPushButton("+")
-        ntb.setObjectName("newTabBtn")
-        ntb.clicked.connect(self._new_tab)
-        self._tl.addWidget(ntb)
+        # Orta: Yeni TabBar widget
+        self._tab_bar = TabBar()
+        self._tab_bar.new_tab_requested.connect(self._new_tab)
+        self._tab_bar.tab_close_requested.connect(self._close)
+        self._tab_bar.tab_switch_requested.connect(self._switch)
+        self._tab_bar.tab_context_requested.connect(self._tab_context_menu)
+        strip_h.addWidget(self._tab_bar)
 
         return tab_strip
 
@@ -251,7 +270,6 @@ class MainWindow(QMainWindow):
             on_remove=self._bookmarks.remove,
             on_add=self._add_bookmark,
         )
-        # İlk yükleme
         self._bm_bar.refresh(self._bookmarks.bookmarks)
         return self._bm_bar
 
@@ -312,12 +330,25 @@ class MainWindow(QMainWindow):
             ("Ctrl+D",     self._add_bookmark),
             ("Ctrl+H",     self._toggle_history),
             ("Ctrl+J",     self._toggle_downloads),
+            ("F11",        self._toggle_fullscreen),
         ]
         for key, fn in shortcuts:
             a = QAction(self)
             a.setShortcut(key)
             a.triggered.connect(fn)
             self.addAction(a)
+
+    def _toggle_fullscreen(self):
+        # Video tam ekrandaysa F11 ile karışmasın
+        p = self._cur()
+        if p and p.in_video_fullscreen:
+            return
+        if self.isFullScreen():
+            self.showNormal()
+            self.status.showMessage("Tam ekrandan çıkıldı", 1500)
+        else:
+            self.showFullScreen()
+            self.status.showMessage("Tam ekran modu (F11 ile çık)", 1500)
 
     # ══════════════════════════════════════════════════════════════════════
     # Servis callback'leri
@@ -350,10 +381,85 @@ class MainWindow(QMainWindow):
         elif attr_name == "restore_session":
             state = "Açık" if value else "Kapalı"
             self.status.showMessage(f"💾 Session Recovery {state}", 2000)
+        elif attr_name == "tab_hibernate":
+            state = "Açık" if value else "Kapalı"
+            if value:
+                self._hibernate_timer.start()
+            else:
+                self._hibernate_timer.stop()
+                self._wake_all_tabs()
+            self.status.showMessage(f"💤 Sekme Uyutma {state}", 2000)
 
     def _on_setting_toggle(self, attr_name: str) -> None:
         """SettingsPanelWidget'dan butona basılınca çağrılır."""
         self._settings.toggle(attr_name)
+
+    # ══════════════════════════════════════════════════════════════════════
+    # Sekme uyutma (hibernation) sistemi
+    # ══════════════════════════════════════════════════════════════════════
+
+    def _check_hibernation(self):
+        """Zamanlayıcıdan çağrılır — uyutulması gereken sekmeleri kontrol et."""
+        if not self._settings.tab_hibernate:
+            return
+        now = time.monotonic()
+        for idx in range(len(self._tabs)):
+            if idx == self._active:
+                self._tab_last_active[idx] = now
+                continue
+            if idx in self._hibernated_tabs:
+                continue
+            last = self._tab_last_active.get(idx, now)
+            if now - last >= HIBERNATE_IDLE_SECONDS:
+                self._hibernate_tab(idx)
+
+    def _hibernate_tab(self, idx: int):
+        """Belirtilen sekmeyi uyut — hafıza tasarrufu sağla."""
+        if idx == self._active or idx in self._hibernated_tabs:
+            return
+        if idx < 0 or idx >= len(self._tabs):
+            return
+
+        _, page = self._tabs[idx]
+        # Gerçek URL'yi kaydet (home page değilse)
+        saved_url = page.url
+        saved_title = page.title
+        if not saved_url or saved_url == "about:blank":
+            return
+
+        # Hafif HTML yükle — ağır sayfa serbest bırakılır
+        page.view.setHtml(HIBERNATE_HTML, QUrl(saved_url))
+        page._hibernated_url = saved_url
+        page._hibernated_title = saved_title
+
+        self._hibernated_tabs.add(idx)
+        tab_item = self._tab_bar.get_item(idx)
+        if tab_item:
+            tab_item.set_hibernated(True)
+
+    def _wake_tab(self, idx: int):
+        """Uyutulmuş sekmeyi uyandır — orijinal sayfayı yeniden yükle."""
+        if idx not in self._hibernated_tabs:
+            return
+        if idx < 0 or idx >= len(self._tabs):
+            return
+
+        _, page = self._tabs[idx]
+        url = getattr(page, '_hibernated_url', '')
+        if url:
+            page.view.load(QUrl(url))
+        del page._hibernated_url
+        del page._hibernated_title
+
+        self._hibernated_tabs.discard(idx)
+        tab_item = self._tab_bar.get_item(idx)
+        if tab_item:
+            tab_item.set_hibernated(False)
+
+    def _wake_all_tabs(self):
+        """Tüm uyutulmuş sekmeleri uyandır."""
+        for idx in list(self._hibernated_tabs):
+            self._wake_tab(idx)
 
     # ══════════════════════════════════════════════════════════════════════
     # Oturum yönetimi
@@ -535,6 +641,14 @@ class MainWindow(QMainWindow):
             act = color_menu.addAction(label)
             act.setData(name)
         dup_act = menu.addAction("⧉  Kopyala")
+
+        # Uyut/Uyanık sekmeyse menüye özel seçenek ekle
+        wake_act = None
+        if idx in self._hibernated_tabs:
+            wake_act = menu.addAction("💤  Uyandır")
+        else:
+            menu.addAction("💤  Uyut").setData("__hibernate__")
+
         menu.addSeparator()
         close_act = menu.addAction("✕  Kapat")
 
@@ -547,6 +661,10 @@ class MainWindow(QMainWindow):
             self._new_tab(self._tabs[idx][1].url)
         elif action.data() in TAB_COLORS:
             self._tabs[idx][0].set_color(action.data())
+        elif action == wake_act:
+            self._wake_tab(idx)
+        elif action.data() == "__hibernate__":
+            self._hibernate_tab(idx)
 
     # ══════════════════════════════════════════════════════════════════════
     # Sekme yönetimi
@@ -559,14 +677,18 @@ class MainWindow(QMainWindow):
             smooth_scroll=self._settings.smooth_scroll,
             dark_mode=self._settings.dark_mode,
         )
-        tw = TabWidget(
-            on_click=lambda chk=False, i=idx: self._switch(i),
-            on_close=lambda chk=False, i=idx: self._close(i),
-            on_right_click=lambda pos, i=idx: self._tab_context_menu(pos, i),
+
+        # TabBar'a yeni sekme ekle
+        tab_item = self._tab_bar.add_tab(
+            index=idx,
+            on_click=self._switch,
+            on_close=self._close,
+            on_right_click=self._tab_context_menu,
         )
-        self._tl.insertWidget(self._tl.count() - 2, tw)
+
         self.stack.addWidget(page)
-        self._tabs.append((tw, page))
+        self._tabs.append((tab_item, page))
+        self._tab_last_active[idx] = time.monotonic()
 
         page.view.titleChanged.connect(lambda t, i=idx: self._on_title(t, i))
         page.view.urlChanged.connect(lambda u, i=idx: self._on_url(u, i))
@@ -580,38 +702,45 @@ class MainWindow(QMainWindow):
     def _switch(self, idx: int):
         if not (0 <= idx < len(self._tabs)):
             return
-        if 0 <= self._active < len(self._tabs):
-            self._tabs[self._active][0].set_active(False)
+
+        # Aktif sekmeyi güncelle
+        self._tab_last_active[idx] = time.monotonic()
+
+        # Uyutulmuş sekmeyi uyandır
+        if idx in self._hibernated_tabs:
+            self._wake_tab(idx)
+
         self._active = idx
-        self._tabs[idx][0].set_active(True)
+        self._tab_bar.set_active(idx)
         self.stack.setCurrentWidget(self._tabs[idx][1])
         self.url_bar.setText(self._tabs[idx][1].url)
+        self._tab_bar.scroll_to_tab(idx)
 
     def _close(self, idx: int):
         if len(self._tabs) <= 1:
             self._tabs[0][1].view.load(QUrl(self.HOME))
             return
-        tw, page = self._tabs.pop(idx)
-        self._tl.removeWidget(tw)
-        tw.deleteLater()
+
+        # Hibernation verilerini temizle
+        self._hibernated_tabs.discard(idx)
+
+        tab_item, page = self._tabs.pop(idx)
+        self._tab_bar.remove_tab(idx)
         self.stack.removeWidget(page)
         page.deleteLater()
-        self._rewire()
+
+        # Index'leri yeniden düzenle
+        self._tab_bar.rewire(
+            on_click=self._switch,
+            on_close=self._close,
+            on_right_click=self._tab_context_menu,
+        )
+        self._tab_last_active = {i: self._tab_last_active.get(i + (1 if i >= idx else 0), time.monotonic())
+                                 for i in range(len(self._tabs))}
+        self._hibernated_tabs = {i - 1 if i > idx else i for i in self._hibernated_tabs if i != idx}
+
         self._active = -1
         self._switch(min(idx, len(self._tabs) - 1))
-
-    def _rewire(self):
-        for i, (tw, _) in enumerate(self._tabs):
-            for sig, slot in [
-                (tw.btn.clicked,                      lambda chk=False, i=i: self._switch(i)),
-                (tw.close_btn.clicked,                lambda chk=False, i=i: self._close(i)),
-                (tw.btn.customContextMenuRequested,   lambda pos, i=i: self._tab_context_menu(pos, i)),
-            ]:
-                try:
-                    sig.disconnect()
-                except Exception:
-                    pass
-                sig.connect(slot)
 
     def _close_current(self):
         self._close(self._active)
@@ -632,6 +761,11 @@ class MainWindow(QMainWindow):
     def _on_url(self, u, idx: int):
         if idx == self._active:
             self.url_bar.setText(u.toString())
+        # URL değiştiğinde uyutulmuşluktan çıkar
+        self._hibernated_tabs.discard(idx)
+        tab_item = self._tab_bar.get_item(idx)
+        if tab_item:
+            tab_item.set_hibernated(False)
 
     def _on_progress(self, v: int):
         self.progress.setVisible(v < 100)
@@ -682,3 +816,9 @@ class MainWindow(QMainWindow):
     def _focus_url(self):
         self.url_bar.setFocus()
         self.url_bar.selectAll()
+
+    def keyPressEvent(self, event):
+        """F11 ve Escape ile tam ekran kontrolü."""
+        if event.key() == Qt.Key.Key_Escape and self.isFullScreen():
+            self.showNormal()
+        super().keyPressEvent(event)

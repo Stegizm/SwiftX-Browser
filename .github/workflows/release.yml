@@ -14,11 +14,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-22.04
-            artifact: SwiftX-v0.28-linux-x86_64
-            asset_name: SwiftX-v0.28-linux-x86_64.tar.gz
+            artifact: SwiftX-v0.28.1-linux-x86_64
+            asset_name: SwiftX-v0.28.1-linux-x86_64.tar.gz
           - os: windows-latest
-            artifact: SwiftX-v0.28-windows-x86_64
-            asset_name: SwiftX-v0.28-windows-x86_64.zip
+            artifact: SwiftX-v0.28.1-windows-x86_64
+            asset_name: SwiftX-v0.28.1-windows-x86_64.zip
 
     runs-on: ${{ matrix.os }}
 
@@ -79,33 +79,34 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: SwiftX Browser v0.28
+          name: SwiftX v0.28.1
           body: |
-            ## SwiftX Browser v0.28
+            ## v0.28.1: Sekme Sistemi Yeniden Tasarım & Performans
 
             ### Yenilikler
-            - God Object refactor: MainWindow parçalara ayrildi
-            - Yeni servis katmani: BookmarkManager, HistoryManager, DownloadManager, SettingsManager
-            - Sidebar, Settings Panel, Bookmark Bar bagimsiz UI bilesenlerine ayrildi
-            - Import hatasi ve duplicate permission handling duzeltildi
-            - DRY toggle pattern uygulandi
+            - **Geleneksel Sekme Düzeni**: Chrome/Firefox tarzı sekme çubuğu
+            - **Sekme Uyutma**: 5 dakika inactive kalan sekmeler otomatik uyutulur
+            - **Performans İyileştirmeleri**: DNS prefetch, 4 raster thread, düşük çözünürlüklü tiling
+            - **Orta Tıklama Kapatma**: Mouse orta tuşu ile sekme kapatma
+            - **Sekme Kaydırma**: Fazla sekme açılınca yatay scroll desteği
 
-            ### Indirme
+            ### Düzeltmeler
+            - Sekme close butonu sadece hover'da görünir (aktif sekme hariç)
+            - Sekme bağlam menüsüne uyut/uyandır seçeneği eklendi
+            - Context menüsü hataları düzeltildi
+
+            ### İndirme
             | Platform | Dosya |
             |----------|-------|
-            | Linux x86_64 | `SwiftX-v0.28-linux-x86_64.tar.gz` |
-            | Windows x86_64 | `SwiftX-v0.28-windows-x86_64.zip` |
-
-            ### Calistirma
-            - **Linux**: Arşivi çikart, `./SwiftX/SwiftX` çalistir
-            - **Windows**: Arşivi çikart, `SwiftX\SwiftX.exe` çalistir
+            | Linux x86_64 | `SwiftX-v0.28.1-linux-x86_64.tar.gz` |
+            | Windows x86_64 | `SwiftX-v0.28.1-windows-x86_64.zip` |
 
             ---
             Made with 💜 by YD Studio Team
           draft: false
           prerelease: false
           files: |
-            artifacts/**/SwiftX-v0.28-linux-x86_64.tar.gz
-            artifacts/**/SwiftX-v0.28-windows-x86_64.zip
+            artifacts/**/SwiftX-v0.28.1-linux-x86_64.tar.gz
+            artifacts/**/SwiftX-v0.28.1-windows-x86_64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
