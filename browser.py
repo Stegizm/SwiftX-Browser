@@ -1,51 +1,40 @@
-v"""
+"""
 browser.py
-SwiftX Browser v0.29 — giriş noktası.
-
-Kullanım:
+SwiftX Browser v0.29 - Entry Point
     python browser.py
 """
-import sys
 import os
 import re
+import sys
 
-# Uygulama dondurulmuş (frozen) olsa da olmasa da kök dizini ekleyelim
+# Uygulama kök dizinini ekle
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
 
-# PyInstaller'ın özel _internal dizinini de ekleyelim
+# PyInstaller internal dizini
 if getattr(sys, 'frozen', False):
-    base_path = sys._MEIPASS
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
     if base_path not in sys.path:
         sys.path.append(base_path)
 
-__version__ = "0.29"
+from core.constants import DATA_DIR, VERSION
 
-from PySide6.QtWidgets import QApplication
 from PySide6.QtWebEngineCore import QWebEngineProfile
+from PySide6.QtWidgets import QApplication
 
 from windows.main_window import MainWindow
 
 
-def _get_data_path() -> str:
-    """Kalıcı veri dizini: çerezler, cache, localStorage vb."""
-    if getattr(sys, 'frozen', False):
-        base = os.path.dirname(sys.executable)
-        return os.path.join(base, "profile")
-    # Geliştirme modunda XDG standardını kullan
-    xdg_data = os.environ.get('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
-    return os.path.join(xdg_data, 'swiftx-browser')
-
-
 def main():
     # ── Kalıcı veri dizinini oluştur ──
-    data_path = _get_data_path()
+    data_path = DATA_DIR
     os.makedirs(data_path, exist_ok=True)
     print(f"[SwiftX] Veri dizini: {data_path}")
 
-    # ── Wayland tespiti ──
+    # ── Platform ve Ortam Tespiti ──
     is_wayland = os.environ.get('WAYLAND_DISPLAY') or os.environ.get('XDG_SESSION_TYPE') == 'wayland'
+    is_linux = sys.platform.startswith("linux")
 
     flags = [
         # ── Medya ──
@@ -60,12 +49,14 @@ def main():
         "--dns-prefetch-enable",
     ]
 
-    if is_wayland:
-        # Wayland + Intel GPU: GPU'yu tamamen kapat
-        # Video yazılımsal decode ile çalışır, WebGL crash önlenir
-        flags.append("--disable-gpu")
-        print("[SwiftX] Wayland tespit edildi, GPU devre dışı (stabil)")
+    if is_linux:
+        # PyInstaller ile derlenmiş Linux sürümlerinde chroot/sandbox çökmesini önle
+        flags.append("--no-sandbox")
+        if not is_wayland:
+            flags.append("--enable-accelerated-video-decode")
+            flags.append("--enable-gpu-rasterization")
     else:
+        # Windows bayrakları
         flags.append("--enable-accelerated-video-decode")
         flags.append("--enable-gpu-rasterization")
 
@@ -73,17 +64,15 @@ def main():
 
     app = QApplication(sys.argv)
     app.setApplicationName("SwiftX Browser")
-    app.setApplicationVersion(__version__)
+    app.setApplicationVersion(VERSION)
     app.setOrganizationName("YD Studio")
 
     # ── Web Engine Profili ───────────────────────────────────────────
     profile = QWebEngineProfile.defaultProfile()
 
-    # Kalıcı depolama yolu — çerezler, localStorage, IndexedDB, cache
     profile.setPersistentStoragePath(data_path)
     profile.setCachePath(os.path.join(data_path, "cache"))
 
-    # Çerez politikası — kalıcı + üçüncü taraf çerezlere izin ver
     profile.setPersistentCookiesPolicy(
         QWebEngineProfile.PersistentCookiesPolicy.AllowPersistentCookies
     )
@@ -94,17 +83,19 @@ def main():
     except Exception:
         pass
 
-    # Gerçek Chromium sürümünü algıla ve UA'i buna göre ayarla
+    # Dinamik OS ve Chromium UA Tanımlaması
     real_ua = profile.httpUserAgent()
     chrome_ver = "120.0.0.0"
     m = re.search(r'Chrome/([\d.]+)', real_ua)
     if m:
         chrome_ver = m.group(1)
+        
+    system_os = "Windows NT 10.0; Win64; x64" if sys.platform == "win32" else "X11; Linux x86_64"
     profile.setHttpUserAgent(
-        f"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+        f"Mozilla/5.0 ({system_os}) AppleWebKit/537.36 "
         f"(KHTML, like Gecko) Chrome/{chrome_ver} Safari/537.36"
     )
-    print(f"[SwiftX] Chromium: {chrome_ver}")
+    print(f"[SwiftX v{VERSION}] Chromium: {chrome_ver} | Platform: {sys.platform}")
 
     MainWindow().show()
     sys.exit(app.exec())

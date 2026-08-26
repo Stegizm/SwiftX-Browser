@@ -1,6 +1,6 @@
 # windows/main_window.py
-# Ana pencere — sadece bileşenleri koordine eder.
-# İş mantığı core.services'a, UI bileşenleri ui/ modüllerine taşındı.
+# Ana pencere - sadece bileşenleri koordine edicek
+# İş mantığı core.services'a, UI bileşenleri ui/ modüllerine taşındı
 import os
 import sys
 import time

@@ -1,107 +1,143 @@
+Dosyada herhangi bir kesinti veya bölünme olmaması adına tüm **`README.md`** içeriğini tek parça ve kopyalamaya hazır blok halinde sunuyorum:
+
+```markdown
+<div align="center">
+
 # SwiftX Browser
 
-> A lightweight browser built with Python & PySide6.
+**A lightweight, fast, and feature-packed web browser powered by Python & PySide6.**
 
-> Python & PySide6 ile geliştirilmiş hafif bir tarayıcı.
+*Python ve PySide6 ile geliştirilmiş; hafif, hızlı ve özellik zengini web tarayıcısı.*
+
+[![Version](https://img.shields.io/badge/version-v0.29-purple.svg?style=for-the-badge)](../../releases)
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Qt](https://img.shields.io/badge/PySide6-Qt%206-41CD52?style=for-the-badge&logo=qt&logoColor=white)](https://qt.io)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+
+[English](#english) • [Türkçe](#türkçe) • [Installation / Kurulum](#build-from-source--kaynaktan-derleme)
+
+</div>
 
 ---
 
-> [!WARNING]
-> **For Global Users**
-> This browser was primarily developed in Turkish. The UI, menus, and settings are in Turkish. English localization is not available yet.
+> [!IMPORTANT]
+> **Language Support Note / Dil Desteği Notu**
+> Currently, the user interface and menus are primarily available in **Turkish**. English localization is planned for upcoming releases.
 
 ---
 
-## 🇬🇧 English
+## English
 
-### About
-SwiftX is a lightweight browser project built on Qt WebEngine.
+### Overview
+SwiftX is a modern, lightweight desktop web browser built on top of Qt WebEngine. Designed with efficiency in mind, it provides essential browsing features out of the box without the overhead of heavy bloatware.
 
-**Current version:** `v0.28`
+### Key Features
+* **Built-in Ad Blocker:** Blocks unwanted ads, tracking scripts, and malicious domains.
+* **Smooth Scrolling:** Enhanced scrolling experience tailored for modern displays.
+* **Auto Dark Mode:** Applies dark themes to web pages for comfortable night browsing.
+* **Session Recovery:** Restores your open tabs and windows after an unexpected restart.
+* **Extension Center:** Manage custom browser extensions easily.
+* **Bookmarks & History:** Organize your favorite pages and view browsing history.
+* **Privacy & Safety:** Configured for isolated persistent data and secure browsing.
 
-### Features
-- 🚫 Ad Blocker
-- 🎯 Smooth Scroll
-- 🌙 Auto Dark Mode
-- 💾 Session Recovery
-- 🧩 Extension Center
-- ⭐ Bookmarks & History
-- 🔒 Safe Browsing
+---
 
-### Downloads
-Go to [Releases](../../releases) for pre-built binaries (Windows & Linux).
+## Türkçe
 
-### Build from Source
-```bash
-pip install PySide6 pyinstaller
-pyinstaller SwiftX.spec
-```
-The output will be in `dist/SwiftX/`.
+### Genel Bakış
+SwiftX, Qt WebEngine mimarisi üzerine inşa edilmiş modern ve hafif bir masaüstü web tarayıcısıdır. Sistem kaynaklarını minimum düzeyde kullanırken ihtiyaç duyduğunuz tüm temel web özelliklerini sunar.
 
-### Project Structure
-```
+### Öne Çıkan Özellikler
+* **Dahili Reklam Engelleyici:** Reklamları, izleyicileri ve zararlı alan adlarını otomatik engeller.
+* **Akıcı Kaydırma (Smooth Scroll):** Web sayfalarında takılmasız ve yumuşak gezinme deneyimi.
+* **Otomatik Karanlık Mod:** Sayfaları karanlık temaya zorlayarak göz yorgunluğunu azaltır.
+* **Oturum Kurtarma:** Beklenmeyen kapanmalarda sekmelerinizi otomatik geri yükler.
+* **Eklenti Merkezi:** Özel eklentilerinizi kolayca yönetin.
+* **Yer İmleri ve Geçmiş:** Sık ziyaret edilen siteleri depolayın ve geçmişi yönetin.
+* **Gizlilik ve Güvenlik:** Çerezler ve oturum verileri için izolasyonlu güvenli veri yapısı.
+
+---
+
+## Project Structure
+
+```text
 swiftx/
-├── browser.py              ← Entry point
-├── core/
-│   ├── constants.py        ← App-wide constants
-│   ├── storage.py          ← JSON load/save helpers
-│   ├── styles.py           ← Qt stylesheets
-│   └── services/           ← Business logic (v0.28)
+├── browser.py              # Application entry point & Qt initialization
+├── SwiftX.spec             # PyInstaller build specification
+├── core/                   # Shared backend components
+│   ├── constants.py        # App-wide constants & paths
+│   ├── storage.py          # JSON file I/O operations
+│   ├── styles.py           # Qt QSS stylesheets
+│   └── services/           # Core business logic managers
 │       ├── bookmark_manager.py
-│       ├── history_manager.py
 │       ├── download_manager.py
+│       ├── history_manager.py
 │       └── settings_manager.py
-├── engine/
-│   ├── scripts.py          ← JS/CSS injection strings
-│   ├── ad_blocker.py       ← AdBlocker class
-│   └── browserpage.py      ← BrowserPage + SmoothScroller
-├── ui/
-│   ├── tab_widget.py       ← Tab button widget
-│   ├── sidebar.py          ← Sidebar with animation
-│   ├── settings_panel.py   ← Settings panel content
-│   ├── bookmark_bar.py     ← Bookmark bar widget
-│   ├── extension_store.py  ← Extension store dialog
-│   └── side_panel.py       ← History/Downloads/Settings panel
-├── windows/
-│   └── main_window.py      ← Main window (coordinator)
-├── data/                   ← Home page & assets
-├── .github/workflows/      ← CI/CD (auto release)
-└── SwiftX.spec             ← PyInstaller build config
+├── engine/                 # Web Engine layer
+│   ├── ad_blocker.py       # Custom ad-blocking logic
+│   ├── browserpage.py      # Custom QWebEngineView implementation
+│   └── scripts.py          # JS / CSS code injections
+├── ui/                     # User interface widgets
+│   ├── bookmark_bar.py     # Bookmark panel widget
+│   ├── extension_store.py  # Extension dialog window
+│   ├── settings_panel.py   # Settings layout
+│   ├── side_panel.py       # Sliding drawer side panel
+│   ├── sidebar.py          # Vertical quick bar
+│   ├── tab_bar.py          # Custom tab bar styling
+│   └── tab_widget.py       # Tab management container
+├── windows/                # Window controllers
+│   └── main_window.py      # Main application window & event wiring
+└── data/                   # Default start page & app assets
+
 ```
 
 ---
 
-## 🇹🇷 Türkçe
+## Build from Source / Kaynaktan Derleme
 
-### Hakkında
-SwiftX, Qt WebEngine üzerine inşa edilmiş hafif bir tarayıcı projesidir.
+### Prerequisites / Önkoşullar
 
-**Mevcut sürüm:** `v0.28`
+* Python 3.9+
+* Git
 
-### Özellikler
-- 🚫 Reklam Engelleyici
-- 🎯 Smooth Scroll
-- 🌙 Otomatik Karanlık Mod
-- 💾 Oturum Kurtarma
-- 🧩 Eklenti Merkezi
-- ⭐ Yer İmleri & Geçmiş
-- 🔒 Güvenli Gezinti
+### Steps / Adımlar
 
-### İndirme
-Hazır derlenmiş dosyalar için [Releases](../../releases) sayfasına gidin.
+1. **Clone the repository:**
+```bash
+git clone [https://github.com/username/swiftx-browser.git](https://github.com/username/swiftx-browser.git)
+cd swiftx-browser
 
-### Kaynaktan Derleme
+```
+
+
+2. **Install dependencies:**
 ```bash
 pip install PySide6 pyinstaller
-```
-Çıktı `dist/SwiftX/` dizininde olacaktır.
 
-### Notlar
-- MIT lisansı ile açık kaynaklıdır.
-- Linux ve Windows için hazır release mevcuttur.
+```
+
+
+3. **Run in development mode:**
+```bash
+python browser.py
+
+```
+
+
+4. **Build binary executable:**
+```bash
+pyinstaller SwiftX.spec
+
+```
+
+*The compiled standalone output will be generated inside the `dist/SwiftX/` folder.*
 
 ---
 
-<p align="center">
-  Made with 💜 by YD Studio Team
-</p>
+## License
+
+Distributed under the **MIT License**. See `LICENSE` for more information.
+
+---
+
+Made with 💜 by **YD Studio Team**
