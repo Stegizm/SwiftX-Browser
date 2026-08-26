@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-26.04
+          - os: ubuntu-26.04+
             artifact: SwiftX-v0.29-linux-x86_64
             asset_name: SwiftX-v0.29-linux-x86_64.tar.gz
           - os: windows-latest
