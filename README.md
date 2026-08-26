@@ -1,4 +1,4 @@
-n<div align="center">
+<div align="center">
 
 # SwiftX Browser
 
