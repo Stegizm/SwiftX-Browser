@@ -1,7 +1,4 @@
-Dosyada herhangi bir kesinti veya bölünme olmaması adına tüm **`README.md`** içeriğini tek parça ve kopyalamaya hazır blok halinde sunuyorum:
-
-```markdown
-<div align="center">
+n<div align="center">
 
 # SwiftX Browser
 
@@ -88,9 +85,6 @@ swiftx/
 ├── windows/                # Window controllers
 │   └── main_window.py      # Main application window & event wiring
 └── data/                   # Default start page & app assets
-
-```
-
 ---
 
 ## Build from Source / Kaynaktan Derleme
