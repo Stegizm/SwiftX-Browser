@@ -1,17 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec - SwiftX Browser v0.29
+"""PyInstaller spec - SwiftX Browser v0.2.9
 
 Kullanım:
     pyinstaller SwiftX.spec
 """
 import os
 import sys
-from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs
+from PyInstaller.utils.hooks import collect_data_files
 
 block_cipher = None
 
-# Qt WebEngine ve PySide6 veri dosyalarını garantiye al
-pyside6_datas = collect_data_files("PySide6")
+# Qt WebEngine ve PySide6 veri dosyalarını topla
+pyside6_webengine_datas = collect_data_files("PySide6.QtWebEngineCore")
 
 a = Analysis(
     ["browser.py"],
@@ -19,7 +19,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ("data", "data"),
-    ] + pyside6_datas,
+    ] + pyside6_webengine_datas,
     hiddenimports=[
         # Core paketleri
         "core",
@@ -48,7 +48,7 @@ a = Analysis(
         # Windows paketleri
         "windows",
         "windows.main_window",
-        # PySide6 & WebEngine kritik bağımlılıkları
+        # PySide6 & WebEngine bağımlılıkları
         "PySide6.QtCore",
         "PySide6.QtGui",
         "PySide6.QtWidgets",
@@ -74,13 +74,13 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,  # GUI uygulaması — konsol penceresini gizle
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,
+    icon="data/logo.ico" if os.path.exists("data/logo.ico") else None,
 )
 
 coll = COLLECT(

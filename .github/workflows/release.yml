@@ -13,12 +13,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-26.04+
-            artifact: SwiftX-v0.29-linux-x86_64
-            asset_name: SwiftX-v0.29-linux-x86_64.tar.gz
+          - os: ubuntu-latest
+            artifact: SwiftX-v0.2.9-linux-x86_64
+            asset_name: SwiftX-v0.2.9-linux-x86_64.tar.gz
           - os: windows-latest
-            artifact: SwiftX-v0.29-windows-x86_64
-            asset_name: SwiftX-v0.29-windows-x86_64.zip
+            artifact: SwiftX-v0.2.9-windows-x86_64
+            asset_name: SwiftX-v0.2.9-windows-x86_64.zip
 
     runs-on: ${{ matrix.os }}
 
@@ -65,23 +65,24 @@ jobs:
 
   release:
     needs: build
-    runs-on: ubuntu/arch
+    runs-on: ubuntu-latest
 
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
+          merge-multiple: true
 
       - name: List artifacts
-        run: find artifacts/ -type f
+        run: ls -la artifacts/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: SwiftX v0.29
+          name: SwiftX v0.2.9
           body: |
-            ## v0.29: Sekme Sistemi Yeniden Tasarım & Performans
+            ## v0.2.9: Sekme Sistemi Yeniden Tasarım & Performans
 
             ### Yenilikler
             - **Geleneksel Sekme Düzeni**: Chrome/Firefox tarzı sekme çubuğu
@@ -92,22 +93,22 @@ jobs:
             - **Youtube Sorunu**: Youtube videoları artık düzgün çalışıyor
 
             ### Düzeltmeler
-            - Sekme close butonu sadece hover'da görünir (aktif sekme hariç)
+            - Sekme close butonu sadece hover'da görünür (aktif sekme hariç)
             - Sekme bağlam menüsüne uyut/uyandır seçeneği eklendi
             - Context menüsü hataları düzeltildi
 
             ### İndirme
             | Platform | Dosya |
             |----------|-------|
-            | Linux x86_64 | `SwiftX-v0.29-linux-x86_64.tar.gz` |
-            | Windows x86_64 | `SwiftX-v0.29-windows-x86_64.zip` |
+            | Linux x86_64 | `SwiftX-v0.2.9-linux-x86_64.tar.gz` |
+            | Windows x86_64 | `SwiftX-v0.2.9-windows-x86_64.zip` |
 
             ---
             Made with 💜 by YD Studio Team
           draft: false
           prerelease: false
           files: |
-            artifacts/**/SwiftX-v0.29-linux-x86_64.tar.gz
-            artifacts/**/SwiftX-v0.29-windows-x86_64.zip
+            artifacts/SwiftX-v0.2.9-linux-x86_64.tar.gz
+            artifacts/SwiftX-v0.2.9-windows-x86_64.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -8,7 +8,7 @@ import sys
 from typing import Dict, List, Tuple
 
 # Uygulama Sürümü
-VERSION = "0.29"
+VERSION = "0.2.9"
 
 SIDEBAR_W = 48
 
@@ -82,7 +82,7 @@ DEFAULT_EXTENSIONS: List[dict] = [
         "desc": "Reklam ve izleme engelle",
         "icon": "🚫",
         "enabled": True,
-        "version": "2.1.0",
+        "version": "1.0.0",
     },
     {
         "id": "speedup",
@@ -90,7 +90,7 @@ DEFAULT_EXTENSIONS: List[dict] = [
         "desc": "Sayfa yüklemesini hızlandır",
         "icon": "⚡",
         "enabled": False,
-        "version": "1.5.2",
+        "version": "1.0.0",
     },
     {
         "id": "privacy",
@@ -98,7 +98,7 @@ DEFAULT_EXTENSIONS: List[dict] = [
         "desc": "İzleme ve profil oluşturmayı engelle",
         "icon": "🔒",
         "enabled": True,
-        "version": "3.0.1",
+        "version": "1.0.0",
     },
     {
         "id": "readmode",
@@ -106,6 +106,6 @@ DEFAULT_EXTENSIONS: List[dict] = [
         "desc": "Makale modunda okumayı etkinleştir",
         "icon": "📖",
         "enabled": False,
-        "version": "1.2.0",
+        "version": "1.0.0",
     },
 ]

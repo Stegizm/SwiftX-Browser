@@ -6,7 +6,7 @@
 
 *Python ve PySide6 ile geliştirilmiş; hafif, hızlı ve özellik zengini web tarayıcısı.*
 
-[![Version](https://img.shields.io/badge/version-v0.29-purple.svg?style=for-the-badge)](../../releases)
+[![Version](https://img.shields.io/badge/version-v0.2.9-purple.svg?style=for-the-badge)](../../releases)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Qt](https://img.shields.io/badge/PySide6-Qt%206-41CD52?style=for-the-badge&logo=qt&logoColor=white)](https://qt.io)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
