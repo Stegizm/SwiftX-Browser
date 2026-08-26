@@ -36,7 +36,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxkbcommon-x11-0 libxcb-xinerama0 libxcb-cursor0 libegl1 libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2 libatspi2.0-0
+          sudo apt-get install -y libxkbcommon-x11-0 libxcb-xinerama0 libxcb-cursor0 libegl1 libglib2.0-0 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2t64 libatspi2.0-0
 
       - name: Install Python deps
         run: |
@@ -93,7 +93,7 @@ jobs:
             - **Youtube Sorunu**: Youtube videoları artık düzgün çalışıyor
 
             ### Düzeltmeler
-            - Sekme close butonu sadece hover'da görünür (aktif sekme hariç)
+            - Sekme close butonu sadece hover'da görünir (aktif sekme hariç)
             - Sekme bağlam menüsüne uyut/uyandır seçeneği eklendi
             - Context menüsü hataları düzeltildi
 
