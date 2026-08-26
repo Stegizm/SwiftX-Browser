@@ -1,11 +1,23 @@
 """
 browser.py
-SwiftX Browser v0.29 - Entry Point
+SwiftX Browser v0.2.9 - Entry Point
     python browser.py
 """
 import os
 import re
 import sys
+
+# ── Platform ve Ortam Ayarları (Importlardan ve QApplication'dan ÖNCE yapılmalı) ──
+is_linux = sys.platform.startswith("linux")
+is_wayland = os.environ.get('WAYLAND_DISPLAY') or os.environ.get('XDG_SESSION_TYPE') == 'wayland'
+
+if is_linux:
+    # Wayland eklentisi EGL crash verirse X11 (xcb) katmanına düşmesini sağla
+    if is_wayland and "QT_QPA_PLATFORM" not in os.environ:
+        os.environ["QT_QPA_PLATFORM"] = "xcb;wayland"
+    
+    # WebEngine Linux sandbox ve mesa çakışmalarını engelle
+    os.environ["QTWEBENGINE_DISABLE_SANDBOX"] = "1"
 
 # Uygulama kök dizinini ekle
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -32,10 +44,6 @@ def main():
     os.makedirs(data_path, exist_ok=True)
     print(f"[SwiftX] Veri dizini: {data_path}")
 
-    # ── Platform ve Ortam Tespiti ──
-    is_wayland = os.environ.get('WAYLAND_DISPLAY') or os.environ.get('XDG_SESSION_TYPE') == 'wayland'
-    is_linux = sys.platform.startswith("linux")
-
     flags = [
         # ── Medya ──
         "--enable-features=HardwareMediaKeyHandling,MediaSessionService",
@@ -50,8 +58,9 @@ def main():
     ]
 
     if is_linux:
-        # PyInstaller ile derlenmiş Linux sürümlerinde chroot/sandbox çökmesini önle
+        # PyInstaller ile derlenmiş Linux sürümlerinde chroot/sandbox ve GPU crashlerini önle
         flags.append("--no-sandbox")
+        flags.append("--disable-gpu-compositing")
         if not is_wayland:
             flags.append("--enable-accelerated-video-decode")
             flags.append("--enable-gpu-rasterization")
@@ -97,7 +106,8 @@ def main():
     )
     print(f"[SwiftX v{VERSION}] Chromium: {chrome_ver} | Platform: {sys.platform}")
 
-    MainWindow().show()
+    main_win = MainWindow()
+    main_win.show()
     sys.exit(app.exec())
 
 
