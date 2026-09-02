@@ -98,7 +98,7 @@ swiftx/
 
 1. **Clone the repository:**
 ```bash
-git clone [https://github.com/username/swiftx-browser.git](https://github.com/username/swiftx-browser.git)
+git clone [https://github.com/stegizm/swiftx-browser.git](https://github.com/stegizm/swiftx-browser.git)
 cd swiftx-browser
 
 ```
